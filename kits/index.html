@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Kit Freelance — le carnet à souches des indépendants · AGORA Kits</title>
+<meta name="description" content="Modèle Notion pour indépendants : clients, devis, factures et encaissements reliés, trois relances déjà écrites et une routine de quinze minutes par semaine. 12 USD.">
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#F2EDE2">
+<style>
+@font-face{font-family:"Cardo";src:url(fonts/Cardo-Regular.woff) format("woff");font-weight:400;font-style:normal;font-display:swap}
+@font-face{font-family:"Cardo";src:url(fonts/Cardo-Italic.woff) format("woff");font-weight:400;font-style:italic;font-display:swap}
+@font-face{font-family:"Cardo";src:url(fonts/Cardo-Bold.woff) format("woff");font-weight:700;font-style:normal;font-display:swap}
+@font-face{font-family:"Anonymous Pro";src:url(fonts/AnonymousPro-Regular.woff) format("woff");font-weight:400;font-display:swap}
+@font-face{font-family:"Anonymous Pro";src:url(fonts/AnonymousPro-Bold.woff) format("woff");font-weight:700;font-display:swap}
+@font-face{font-family:"Anton";src:url(fonts/Anton-Regular.woff) format("woff");font-weight:400;font-display:swap}
+
+:root{
+  --papier:#F2EDE2; --papier-2:#E9E2D3; --papier-3:#DED5C2;
+  --encre:#1A2238; --encre-2:#3B4257; --graphite:#6E6A62;
+  --carbone:#3F3A8F; --tampon:#C8432B; --vert:#2F6B4F; --ocre:#B7802A;
+  --serif:"Cardo", "Iowan Old Style", Georgia, serif;
+  --mono:"Anonymous Pro", ui-monospace, "SFMono-Regular", Menlo, monospace;
+  --stamp:"Anton", Impact, sans-serif;
+  --w:1240px; --gut:clamp(20px,4vw,48px);
+  --ease:cubic-bezier(.2,.7,.1,1);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-text-size-adjust:100%;scroll-behavior:smooth;overflow-x:clip}
+body{background:var(--papier);color:var(--encre);font-family:var(--serif);font-size:19px;line-height:1.5;
+  font-feature-settings:"kern","liga","onum";text-rendering:optimizeLegibility;-webkit-font-smoothing:antialiased}
+body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:100;opacity:.35;mix-blend-mode:multiply;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .45 0 0 0 0 .40 0 0 0 0 .32 0 0 0 .22 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+a{color:inherit}
+::selection{background:var(--carbone);color:var(--papier)}
+.wrap{max-width:var(--w);margin:0 auto;padding:0 var(--gut)}
+.mono{font-family:var(--mono);font-feature-settings:"tnum","lnum"}
+.sc{font-variant:small-caps;letter-spacing:.06em}
+.skip{position:absolute;left:-9999px}.skip:focus{left:16px;top:16px;z-index:200;background:var(--encre);color:var(--papier);padding:10px 14px}
+:focus-visible{outline:2px solid var(--carbone);outline-offset:3px}
+
+/* ---------- barre ---------- */
+.bar{position:sticky;top:0;z-index:50;background:color-mix(in srgb,var(--papier) 88%,transparent);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border-bottom:1px solid var(--papier-3)}
+.bar .wrap{display:flex;align-items:center;justify-content:space-between;height:60px;gap:16px}
+.logo{display:flex;align-items:baseline;gap:10px;text-decoration:none}
+.logo b{font-family:var(--mono);font-size:13px;letter-spacing:.16em;font-weight:700}
+.logo span{font-style:italic;color:var(--graphite);font-size:15px}
+.bar nav{display:flex;gap:28px;font-family:var(--mono);font-size:13px;letter-spacing:.04em}
+.bar nav a{text-decoration:none;color:var(--encre-2)}
+.bar nav a:hover{color:var(--encre);text-decoration:underline;text-underline-offset:4px}
+.btn{display:inline-flex;align-items:center;gap:12px;font-family:var(--mono);font-weight:700;font-size:14px;letter-spacing:.04em;
+  background:var(--encre);color:var(--papier);text-decoration:none;border:0;cursor:pointer;padding:15px 22px;border-radius:2px;
+  box-shadow:3px 3px 0 var(--carbone);transition:transform .2s var(--ease),box-shadow .2s var(--ease)}
+.btn:hover{transform:translate(-1px,-1px);box-shadow:5px 5px 0 var(--carbone)}
+.btn:active{transform:translate(2px,2px);box-shadow:1px 1px 0 var(--carbone)}
+.btn svg{width:18px;height:18px}
+.btn.sm{padding:10px 14px;font-size:12px;box-shadow:2px 2px 0 var(--carbone)}
+.lien{font-family:var(--mono);font-size:14px;color:var(--encre-2);text-underline-offset:5px}
+@media (max-width:760px){.bar nav{display:none}}
+
+/* ---------- héros ---------- */
+.hero{padding:clamp(40px,7vw,96px) 0 clamp(56px,8vw,120px);position:relative;overflow-x:clip}
+.hero .wrap{display:grid;grid-template-columns:1.05fr .95fr;gap:clamp(32px,5vw,80px);align-items:center}
+.kicker{font-family:var(--mono);font-size:13px;letter-spacing:.12em;text-transform:uppercase;color:var(--encre-2);display:flex;gap:14px;align-items:center;margin-bottom:28px}
+.kicker i{display:block;width:36px;height:1px;background:currentColor}
+h1{font-weight:400;font-size:clamp(46px,7.4vw,104px);line-height:.94;letter-spacing:-.025em}
+h1 em{font-style:italic;color:var(--carbone)}
+.lead{font-size:clamp(19px,1.6vw,22px);max-width:34ch;margin:30px 0 36px;color:var(--encre-2)}
+.cta{display:flex;flex-wrap:wrap;gap:18px 26px;align-items:center}
+.note{font-family:var(--mono);font-size:12.5px;color:var(--graphite);margin-top:20px;max-width:46ch;line-height:1.55}
+@media (max-width:900px){.hero .wrap{grid-template-columns:1fr}}
+
+/* la souche */
+.carnet{position:relative;aspect-ratio:4/4.6;max-width:520px;width:100%;justify-self:center}
+.feuille{position:absolute;inset:0;background:#FBF8F1;border:1px solid var(--papier-3);box-shadow:0 1px 0 #fff inset,0 30px 60px -30px rgba(26,34,56,.35),0 8px 18px -12px rgba(26,34,56,.25);display:grid;grid-template-columns:28% 1fr}
+.feuille.double{transform:translate(24px,20px) rotate(2.2deg);background:#ECE6F2;border-color:#D4CCE3;box-shadow:none}
+.feuille.double *{color:var(--carbone)!important;border-color:rgba(63,58,143,.35)!important;filter:blur(.35px)}
+.talon{border-right:2px dashed var(--papier-3);padding:22px 16px;display:flex;flex-direction:column;justify-content:space-between;position:relative}
+.talon::after{content:"";position:absolute;right:-7px;top:0;bottom:0;width:12px;background:radial-gradient(circle,var(--papier) 3.2px,transparent 3.6px) 0 0/12px 16px repeat-y}
+.talon .n{font-family:var(--mono);font-size:12px;letter-spacing:.08em;color:var(--graphite)}
+.talon .n strong{display:block;font-size:22px;color:var(--encre);letter-spacing:.02em;margin-top:4px}
+.talon .mini{font-family:var(--mono);font-size:11px;line-height:1.7;color:var(--graphite)}
+.corps{padding:24px 24px 22px;display:flex;flex-direction:column}
+.corps h3{font-weight:400;font-style:italic;font-size:26px;border-bottom:1px solid var(--encre);padding-bottom:10px;margin-bottom:6px;display:flex;justify-content:space-between;align-items:baseline}
+.corps h3 small{font-family:var(--mono);font-style:normal;font-size:11px;letter-spacing:.1em;color:var(--graphite)}
+.ligne{display:grid;grid-template-columns:42% 1fr;gap:10px;padding:9px 0;border-bottom:1px solid var(--papier-3);align-items:baseline}
+.ligne dt{font-family:var(--mono);font-size:11.5px;letter-spacing:.04em;color:var(--graphite)}
+.ligne dd{font-size:17px}
+.ligne dd.mono{font-size:15px}
+.puce{display:inline-block;font-family:var(--mono);font-size:11.5px;padding:2px 8px;border-radius:2px;border:1px solid currentColor;letter-spacing:.03em}
+.puce.envoye{color:#2D5A8C}.puce.relance{color:var(--ocre)}.puce.accepte{color:var(--vert)}.puce.paye{color:var(--vert)}.puce.retard{color:var(--tampon)}.puce.brouillon{color:var(--graphite)}
+.corps .pied{margin-top:auto;padding-top:14px;font-family:var(--mono);font-size:10.5px;color:var(--graphite);letter-spacing:.06em}
+.tampon{position:absolute;right:8%;bottom:20%;font-family:var(--stamp);font-size:clamp(30px,4.2vw,46px);letter-spacing:.04em;color:var(--tampon);
+  border:4px solid var(--tampon);padding:2px 14px 0;line-height:1.15;transform:rotate(-9deg);mix-blend-mode:multiply;opacity:.9;
+  -webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='120'%3E%3Cfilter id='r'%3E%3CfeTurbulence baseFrequency='.9' numOctaves='2'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -2.4 1.7'/%3E%3C/filter%3E%3Crect width='300' height='120' filter='url(%23r)'/%3E%3C/svg%3E") 0 0/100% 100%;
+  mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='120'%3E%3Cfilter id='r'%3E%3CfeTurbulence baseFrequency='.9' numOctaves='2'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -2.4 1.7'/%3E%3C/filter%3E%3Crect width='300' height='120' filter='url(%23r)'/%3E%3C/svg%3E") 0 0/100% 100%}
+.js .tampon{opacity:0;transform:rotate(-9deg) scale(1.9)}
+.js .tampon.pose{animation:pose .45s var(--ease) .9s forwards}
+@keyframes pose{0%{opacity:0;transform:rotate(-14deg) scale(1.9)}70%{opacity:.95;transform:rotate(-8deg) scale(.96)}100%{opacity:.9;transform:rotate(-9deg) scale(1)}}
+.exemple{position:absolute;left:0;bottom:-34px;font-family:var(--mono);font-size:11px;color:var(--graphite);letter-spacing:.05em}
+
+/* ---------- sections ---------- */
+section{position:relative}
+.folio{font-family:var(--mono);font-size:12.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--graphite);display:flex;gap:16px;align-items:center;padding-top:22px;border-top:1px solid var(--encre)}
+.folio b{color:var(--encre)}
+h2{font-weight:400;font-size:clamp(36px,5vw,68px);line-height:1;letter-spacing:-.02em;margin:26px 0 22px;max-width:18ch}
+h2 em{color:var(--carbone)}
+.intro{font-size:clamp(18px,1.4vw,21px);color:var(--encre-2);max-width:56ch}
+.bloc{padding:clamp(64px,9vw,128px) 0}
+
+/* trois bases : onglets */
+.onglets{margin-top:48px;display:grid;grid-template-columns:280px 1fr;gap:0;border:1px solid var(--encre);background:#FBF8F1}
+.onglets [role=tablist]{display:flex;flex-direction:column;border-right:1px solid var(--encre)}
+.onglets [role=tab]{all:unset;cursor:pointer;padding:22px 22px;border-bottom:1px solid var(--papier-3);display:flex;flex-direction:column;gap:6px;position:relative}
+.onglets [role=tab] .mono{font-size:11.5px;color:var(--graphite);letter-spacing:.08em}
+.onglets [role=tab] span:last-child{font-size:24px;line-height:1.1}
+.onglets [role=tab][aria-selected=true]{background:var(--encre);color:var(--papier)}
+.onglets [role=tab][aria-selected=true] .mono{color:#B9BED0}
+.onglets [role=tab]:focus-visible{outline-offset:-4px}
+.onglets [role=tabpanel]{padding:28px 32px 32px}
+.onglets [role=tabpanel][hidden]{display:none}
+.panneau-tete{display:flex;justify-content:space-between;gap:20px;align-items:baseline;flex-wrap:wrap;margin-bottom:18px}
+.panneau-tete p{color:var(--encre-2);max-width:52ch;font-size:17.5px}
+table.props{width:100%;border-collapse:collapse;font-size:16px}
+.props th{font-family:var(--mono);font-weight:400;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--graphite);text-align:left;padding:0 0 8px;border-bottom:1px solid var(--encre)}
+.props td{padding:10px 12px 10px 0;border-bottom:1px solid var(--papier-3);vertical-align:top}
+.props td:first-child{white-space:nowrap}
+.props td.mono{font-size:13px;color:var(--encre-2)}
+.props .opts{display:flex;flex-wrap:wrap;gap:6px}
+.props .opts .puce{font-size:11px}
+@media (max-width:820px){.onglets{grid-template-columns:1fr}.onglets [role=tablist]{flex-direction:row;overflow-x:auto;border-right:0;border-bottom:1px solid var(--encre)}
+  .onglets [role=tab]{flex:1 0 auto;border-bottom:0;border-right:1px solid var(--papier-3);padding:14px 16px}.onglets [role=tab] span:last-child{font-size:18px}
+  .onglets [role=tabpanel]{padding:20px 16px}.props td.mono{display:none}.props th:nth-child(2){display:none}.props td:first-child{white-space:normal;width:42%}}
+.onglets>*{min-width:0}
+
+/* parcours */
+.parcours{display:grid;grid-template-columns:1fr 1fr;gap:clamp(32px,6vw,96px);margin-top:56px}
+.etapes{list-style:none;counter-reset:e}
+.etapes li{counter-increment:e;padding:26px 0 26px 64px;border-top:1px solid var(--papier-3);position:relative;opacity:.38;transition:opacity .4s var(--ease);min-height:30vh}
+.etapes li::before{content:counter(e,decimal-leading-zero);position:absolute;left:0;top:28px;font-family:var(--mono);font-size:13px;letter-spacing:.08em;color:var(--graphite)}
+.etapes li.on{opacity:1}
+.etapes h3{font-weight:400;font-size:28px;line-height:1.1;margin-bottom:8px}
+.etapes p{color:var(--encre-2);font-size:17.5px;max-width:42ch}
+.scene{position:sticky;top:110px;align-self:start}
+.fiche{background:#FBF8F1;border:1px solid var(--encre);padding:24px 24px 18px;box-shadow:8px 8px 0 var(--papier-2)}
+.fiche .ent{display:flex;justify-content:space-between;align-items:baseline;border-bottom:1px solid var(--encre);padding-bottom:10px;margin-bottom:4px}
+.fiche .ent b{font-weight:400;font-style:italic;font-size:24px}
+.fiche .ent .mono{font-size:11px;color:var(--graphite);letter-spacing:.08em}
+.compteur{margin-top:18px;padding-top:16px;border-top:2px solid var(--encre);display:flex;justify-content:space-between;align-items:baseline;gap:12px}
+.compteur span:first-child{font-family:var(--mono);font-size:11.5px;letter-spacing:.08em;color:var(--graphite);text-transform:uppercase}
+.compteur strong{font-family:var(--mono);font-size:clamp(28px,3vw,40px);font-weight:700;letter-spacing:-.01em}
+.fiche .legende{font-family:var(--mono);font-size:10.5px;color:var(--graphite);margin-top:14px;letter-spacing:.04em}
+.puce,.ligne dd{transition:color .3s}
+@media (max-width:900px){.parcours{grid-template-columns:1fr;gap:8px}.scene{top:68px;z-index:5;order:-1}.etapes li{min-height:42vh;padding:22px 0 22px 52px}
+  .fiche{padding:12px 14px 10px;box-shadow:4px 4px 0 var(--papier-2)}.fiche .ent b{font-size:19px}.fiche .ligne{padding:5px 0}.fiche .ligne dd{font-size:15px}
+  .fiche dl .ligne:nth-child(1),.fiche dl .ligne:nth-child(4){display:none}.compteur{margin-top:8px;padding-top:8px}.compteur strong{font-size:24px}.fiche .legende{margin-top:6px;font-size:9.5px}}
+@media (max-width:560px){.talon{padding:18px 10px}.talon .n strong{font-size:15px;white-space:nowrap}.talon .mini{font-size:10px}.corps{padding:18px 16px}.corps h3{font-size:22px}.carnet .ligne{grid-template-columns:1fr;gap:2px;padding:7px 0}.carnet .ligne dd{font-size:16px}}
+
+/* relances */
+.lettres{display:grid;grid-template-columns:1.2fr .8fr;gap:28px;margin-top:52px;align-items:start}
+.lettre{background:#FBF8F1;border:1px solid var(--papier-3);padding:clamp(24px,3.4vw,44px);position:relative;
+  background-image:repeating-linear-gradient(#FBF8F1 0 31px,#E7E0EE 31px 32px);background-position:0 18px}
+.lettre .quand{font-family:var(--mono);font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--carbone);margin-bottom:22px;display:flex;justify-content:space-between;gap:12px;align-items:center}
+.lettre p{font-size:19px;line-height:32px;margin-bottom:32px}
+.lettre p:last-child{margin-bottom:0}
+.lettre mark{background:none;color:var(--carbone);font-family:var(--mono);font-size:15px}
+.copier{all:unset;cursor:pointer;font-family:var(--mono);font-size:11.5px;letter-spacing:.06em;color:var(--encre);border:1px solid var(--encre);padding:6px 10px;display:inline-flex;gap:8px;align-items:center;background:var(--papier)}
+.copier svg{width:14px;height:14px}
+.pile{display:flex;flex-direction:column;gap:16px}
+.pile .lettre{padding:22px 22px 0;max-height:210px;overflow:hidden}
+.pile .lettre::after{content:"";position:absolute;inset:auto 0 0 0;height:110px;background:linear-gradient(transparent,var(--papier) 85%)}
+.pile .lettre .inclus{position:absolute;z-index:2;left:22px;bottom:16px;font-family:var(--mono);font-size:11.5px;letter-spacing:.06em;color:var(--encre-2)}
+@media (max-width:900px){.lettres{grid-template-columns:1fr}}
+
+/* semaine */
+.semaine{margin-top:48px;border-top:1px solid var(--encre)}
+.jour{display:grid;grid-template-columns:200px 1fr 120px;gap:24px;padding:26px 0;border-bottom:1px solid var(--papier-3);align-items:baseline}
+.jour h3{font-weight:400;font-style:italic;font-size:clamp(30px,3.4vw,44px);line-height:1}
+.jour p{font-size:19px;color:var(--encre-2);max-width:52ch}
+.jour .mono{text-align:right;font-size:13px;color:var(--graphite)}
+@media (max-width:700px){.jour{grid-template-columns:1fr;gap:6px}.jour .mono{text-align:left}}
+
+/* 2027 */
+.c2027{display:grid;grid-template-columns:1fr 1fr;gap:clamp(28px,5vw,72px);margin-top:48px;align-items:start}
+.aiguillage{border:1px solid var(--encre);background:#FBF8F1}
+.aiguillage .r{display:grid;grid-template-columns:1fr auto 1fr;gap:14px;align-items:center;padding:18px 20px;border-bottom:1px solid var(--papier-3)}
+.aiguillage .r:last-child{border-bottom:0}
+.aiguillage .r span{font-size:18px}
+.aiguillage .r .mono{font-size:13px;text-align:right}
+.aiguillage svg{width:44px;height:12px;color:var(--carbone)}
+.aiguillage .t{padding:12px 20px;font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--graphite);border-bottom:1px solid var(--encre);display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.aiguillage .t span:last-child{text-align:right}
+.c2027 .txt p{font-size:18.5px;color:var(--encre-2);margin-bottom:16px}
+.c2027 .txt .mono{font-size:13px;color:var(--graphite)}
+@media (max-width:900px){.c2027{grid-template-columns:1fr}}
+
+/* limites */
+.limites{display:grid;grid-template-columns:repeat(3,1fr);gap:0;margin-top:44px;border-top:1px solid var(--encre)}
+.limites div{padding:26px 24px 26px 0;border-bottom:1px solid var(--papier-3)}
+.limites div+div{padding-left:24px;border-left:1px solid var(--papier-3)}
+.limites h3{font-weight:400;font-size:24px;margin-bottom:8px;display:flex;gap:10px;align-items:baseline}
+.limites h3 svg{width:16px;height:16px;flex:none;color:var(--tampon);transform:translateY(1px)}
+.limites p{font-size:17px;color:var(--encre-2)}
+@media (max-width:820px){.limites{grid-template-columns:1fr}.limites div+div{padding-left:0;border-left:0}}
+
+/* achat */
+.achat{background:var(--encre);color:var(--papier)}
+.achat .folio{border-color:var(--papier);color:#A9AFC2}.achat .folio b{color:var(--papier)}
+.achat h2 em{color:#B4AEF0}
+.achat .intro{color:#C9CDD9}
+.billet{margin-top:52px;display:grid;grid-template-columns:1.1fr .9fr;background:var(--papier);color:var(--encre);position:relative}
+.billet::before{content:"";position:absolute;left:55%;top:0;bottom:0;width:0;border-left:2px dashed var(--papier-3)}
+.billet .g{padding:clamp(24px,3.6vw,48px)}
+.billet .prix{display:flex;align-items:baseline;gap:14px;margin:10px 0 6px}
+.billet .prix strong{font-family:var(--mono);font-weight:700;font-size:clamp(64px,8vw,112px);letter-spacing:-.04em;line-height:.9}
+.billet .prix span{font-family:var(--mono);font-size:18px}
+.billet ul{list-style:none;margin:22px 0 0}
+.billet li{display:flex;gap:12px;padding:10px 0;border-top:1px solid var(--papier-3);font-size:17.5px}
+.billet li svg{width:16px;height:16px;flex:none;margin-top:5px;color:var(--vert)}
+.billet ol{list-style:none;counter-reset:s}
+.billet ol li{counter-increment:s;border-top:1px solid var(--papier-3);display:grid;grid-template-columns:36px 1fr;gap:6px}
+.billet ol li::before{content:counter(s,decimal-leading-zero);font-family:var(--mono);font-size:13px;color:var(--graphite);padding-top:3px}
+.billet .d{background:var(--papier-2);display:flex;flex-direction:column;gap:20px}
+.billet .d .btn{justify-content:center}
+.billet small{font-family:var(--mono);font-size:12px;color:var(--graphite);line-height:1.6;display:block}
+@media (max-width:900px){.billet{grid-template-columns:1fr}.billet::before{display:none}.billet .d{border-top:2px dashed var(--papier-3)}}
+
+/* FAQ */
+.faq{margin-top:44px;border-top:1px solid var(--encre)}
+.faq details{border-bottom:1px solid var(--papier-3)}
+.faq summary{list-style:none;cursor:pointer;padding:22px 44px 22px 0;font-size:clamp(20px,2vw,25px);position:relative}
+.faq summary::-webkit-details-marker{display:none}
+.faq summary svg{position:absolute;right:4px;top:28px;width:18px;height:18px;transition:transform .3s var(--ease)}
+.faq details[open] summary svg{transform:rotate(45deg)}
+.faq details p{padding:0 0 24px;max-width:66ch;color:var(--encre-2);font-size:18px}
+
+footer{padding:56px 0 64px;border-top:1px solid var(--encre);font-family:var(--mono);font-size:12.5px;color:var(--graphite);line-height:1.8}
+footer .wrap{display:grid;grid-template-columns:1fr 1fr;gap:28px}
+footer .proto{color:var(--tampon)}
+@media (max-width:700px){footer .wrap{grid-template-columns:1fr}}
+
+/* apparitions */
+.js .monte{opacity:0;transform:translateY(22px);transition:opacity .8s var(--ease),transform .8s var(--ease)}
+.js .monte.vu{opacity:1;transform:none}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important;scroll-behavior:auto!important}
+  .js .monte{opacity:1;transform:none}.js .tampon{opacity:.9;transform:rotate(-9deg)}}
+</style>
+</head>
+<body>
+<a class="skip" href="#contenu">Aller au contenu</a>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-fleche" viewBox="0 0 24 24"><path d="M4 12h15M13 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="square"/></symbol>
+  <symbol id="i-ok" viewBox="0 0 16 16"><path d="M2.5 8.5l3.5 3.5 7.5-8" fill="none" stroke="currentColor" stroke-width="1.8"/></symbol>
+  <symbol id="i-non" viewBox="0 0 16 16"><path d="M3 3l10 10M13 3L3 13" fill="none" stroke="currentColor" stroke-width="1.8"/></symbol>
+  <symbol id="i-plus" viewBox="0 0 18 18"><path d="M9 2v14M2 9h14" fill="none" stroke="currentColor" stroke-width="1.6"/></symbol>
+  <symbol id="i-copie" viewBox="0 0 16 16"><rect x="5" y="5" width="9" height="9" fill="none" stroke="currentColor" stroke-width="1.4"/><path d="M11 5V2H2v9h3" fill="none" stroke="currentColor" stroke-width="1.4"/></symbol>
+  <symbol id="i-rail" viewBox="0 0 44 12"><path d="M0 6h40M35 1l6 5-6 5" fill="none" stroke="currentColor" stroke-width="1.4"/></symbol>
+</svg>
+
+<header class="bar">
+  <div class="wrap">
+    <a class="logo" href="#top"><b>AGORA KITS</b><span>Kit Freelance</span></a>
+    <nav aria-label="Sections">
+      <a href="#bases">Le contenu</a>
+      <a href="#parcours">Le parcours</a>
+      <a href="#relances">Les relances</a>
+      <a href="#achat">Le prix</a>
+    </nav>
+    <a class="btn sm" href="https://buy.stripe.com/dRm4gr89T9ataxM0iL9fW00">Acheter · 12 USD</a>
+  </div>
+</header>
+
+<main id="contenu">
+<!-- HÉROS -->
+<section class="hero" id="top">
+  <div class="wrap">
+    <div>
+      <p class="kicker"><i></i>Modèle Notion pour indépendants</p>
+      <h1>Le carnet à souches <em>des indépendants.</em></h1>
+      <p class="lead">Tes clients, tes devis, tes factures et l'argent vraiment arrivé sur ton compte, reliés dans un seul espace Notion. Avec trois relances déjà écrites et une routine de quinze minutes par semaine.</p>
+      <div class="cta">
+        <a class="btn" href="https://buy.stripe.com/dRm4gr89T9ataxM0iL9fW00">Acheter le kit · 12 USD <svg aria-hidden="true"><use href="#i-fleche"/></svg></a>
+        <a class="lien" href="#bases">Voir ce qu'il contient</a>
+      </div>
+      <p class="note">Paiement unique par Stripe. Le modèle t'est envoyé par e-mail sous deux jours ouvrés, avec son lien de duplication.</p>
+    </div>
+
+    <div class="carnet" aria-label="Illustration : une souche de devis du modèle, avec un tampon À relancer">
+      <div class="feuille double" aria-hidden="true">
+        <div class="talon"><div class="n">Devis<strong>D-0012</strong></div><div class="mini">Relance<br>04/12</div></div>
+        <div class="corps"><h3>Devis</h3></div>
+      </div>
+      <div class="feuille">
+        <div class="talon">
+          <div class="n">Devis n°<strong>D-0012</strong></div>
+          <div class="mini">Talon conservé<br>Envoyé 28/11<br>Relance 04/12</div>
+        </div>
+        <div class="corps">
+          <h3>Devis <small>BASE DEVIS</small></h3>
+          <dl>
+            <div class="ligne"><dt>Client</dt><dd>Atelier Marnier</dd></div>
+            <div class="ligne"><dt>Objet</dt><dd>Refonte du site vitrine</dd></div>
+            <div class="ligne"><dt>Montant proposé</dt><dd class="mono">2 400,00 €</dd></div>
+            <div class="ligne"><dt>Envoyé le</dt><dd class="mono">28/11</dd></div>
+            <div class="ligne"><dt>Relance prévue</dt><dd class="mono">04/12</dd></div>
+            <div class="ligne"><dt>Statut</dt><dd><span class="puce envoye">Envoyé</span></dd></div>
+          </dl>
+          <p class="pied">PROCHAINE ÉTAPE · APPELER SI PAS DE RÉPONSE</p>
+        </div>
+      </div>
+      <div class="tampon" aria-hidden="true">À RELANCER</div>
+      <p class="exemple">Exemple fictif · champs réels du modèle</p>
+    </div>
+  </div>
+</section>
+
+<!-- BASES -->
+<section class="bloc" id="bases">
+  <div class="wrap">
+    <p class="folio monte"><b>Folio 01</b><span>Ce qu'il y a dans le kit</span></p>
+    <h2 class="monte">Trois bases, <em>reliées entre elles.</em></h2>
+    <p class="intro monte">Un client a ses devis, un devis accepté devient une facture, une facture se règle en une ou plusieurs fois. Chaque base connaît les deux autres : tu ouvres un client et tu vois tout son historique.</p>
+
+    <div class="onglets monte">
+      <div role="tablist" aria-label="Bases du modèle">
+        <button role="tab" id="t-clients" aria-controls="p-clients" aria-selected="true"><span class="mono">BASE 1 · 12 PROPRIÉTÉS</span><span>Clients</span></button>
+        <button role="tab" id="t-devis" aria-controls="p-devis" aria-selected="false" tabindex="-1"><span class="mono">BASE 2 · 11 PROPRIÉTÉS</span><span>Devis</span></button>
+        <button role="tab" id="t-factures" aria-controls="p-factures" aria-selected="false" tabindex="-1"><span class="mono">BASE 3 · 13 PROPRIÉTÉS</span><span>Factures et encaissements</span></button>
+      </div>
+
+      <div role="tabpanel" id="p-clients" aria-labelledby="t-clients">
+        <div class="panneau-tete"><p>Qui sont tes clients, d'où ils viennent, et la prochaine chose à faire pour chacun.</p></div>
+        <table class="props">
+          <thead><tr><th>Propriété</th><th>Type</th><th>Valeurs</th></tr></thead>
+          <tbody>
+            <tr><td>Client</td><td class="mono">titre</td><td></td></tr>
+            <tr><td>Statut</td><td class="mono">sélection</td><td><div class="opts"><span class="puce relance">Prospect</span><span class="puce accepte">Actif</span><span class="puce brouillon">Inactif</span></div></td></tr>
+            <tr><td>Type de client</td><td class="mono">sélection</td><td><div class="opts"><span class="puce envoye">Professionnel en France</span><span class="puce accepte">Particulier</span><span class="puce brouillon">Étranger</span></div></td></tr>
+            <tr><td>Source</td><td class="mono">sélection</td><td><div class="opts"><span class="puce brouillon">Recommandation</span><span class="puce brouillon">Site</span><span class="puce brouillon">Réseau</span><span class="puce brouillon">Autre</span></div></td></tr>
+            <tr><td>Contact, Email, SIREN</td><td class="mono">texte, e-mail</td><td></td></tr>
+            <tr><td>Prochaine action, Date de suivi</td><td class="mono">texte, date</td><td></td></tr>
+            <tr><td>Devis, Factures</td><td class="mono">relations</td><td>Vers les deux autres bases</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div role="tabpanel" id="p-devis" aria-labelledby="t-devis" hidden>
+        <div class="panneau-tete"><p>Chaque proposition envoyée, sa date de validité et le jour où tu relances. Avec deux vues prêtes : « À relancer » et « Pipeline ».</p></div>
+        <table class="props">
+          <thead><tr><th>Propriété</th><th>Type</th><th>Valeurs</th></tr></thead>
+          <tbody>
+            <tr><td>Référence</td><td class="mono">titre</td><td></td></tr>
+            <tr><td>Statut</td><td class="mono">sélection</td><td><div class="opts"><span class="puce brouillon">Brouillon</span><span class="puce envoye">Envoyé</span><span class="puce relance">Relancé</span><span class="puce accepte">Accepté</span><span class="puce retard">Refusé</span><span class="puce brouillon">Expiré</span></div></td></tr>
+            <tr><td>Objet, Montant proposé</td><td class="mono">texte, euros</td><td></td></tr>
+            <tr><td>Envoyé le, Valide jusqu'au</td><td class="mono">dates</td><td></td></tr>
+            <tr><td>Relance prévue</td><td class="mono">date</td><td>Alimente la vue « À relancer »</td></tr>
+            <tr><td>Prochaine étape, Lien du PDF</td><td class="mono">texte, lien</td><td></td></tr>
+            <tr><td>Client, Factures</td><td class="mono">relations</td><td></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div role="tabpanel" id="p-factures" aria-labelledby="t-factures" hidden>
+        <div class="panneau-tete"><p>Ce que tu as facturé, ce que tu as réellement reçu, et ce qu'il reste à encaisser, calculé tout seul.</p></div>
+        <table class="props">
+          <thead><tr><th>Propriété</th><th>Type</th><th>Valeurs</th></tr></thead>
+          <tbody>
+            <tr><td>Référence</td><td class="mono">titre</td><td></td></tr>
+            <tr><td>Statut</td><td class="mono">sélection</td><td><div class="opts"><span class="puce brouillon">À émettre</span><span class="puce envoye">Envoyée</span><span class="puce relance">Partiellement payée</span><span class="puce paye">Payée</span><span class="puce retard">En retard</span></div></td></tr>
+            <tr><td>Total TTC, Montant reçu</td><td class="mono">euros</td><td>Montant reçu : seulement l'argent arrivé</td></tr>
+            <tr><td>Reste à encaisser</td><td class="mono">formule</td><td>Total TTC moins Montant reçu</td></tr>
+            <tr><td>Date de facture, Échéance, Date d'encaissement</td><td class="mono">dates</td><td></td></tr>
+            <tr><td>Moyen de paiement</td><td class="mono">sélection</td><td><div class="opts"><span class="puce brouillon">Virement</span><span class="puce brouillon">Carte</span><span class="puce brouillon">Autre</span></div></td></tr>
+            <tr><td>Canal 2027</td><td class="mono">formule</td><td>Facture électronique ou e-reporting</td></tr>
+            <tr><td>Client, Devis associé, Lien PDF</td><td class="mono">relations, lien</td><td></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PARCOURS -->
+<section class="bloc" id="parcours" style="padding-top:0">
+  <div class="wrap">
+    <p class="folio monte"><b>Folio 02</b><span>Comment ça se passe</span></p>
+    <h2 class="monte">D'un devis envoyé <em>à l'argent reçu.</em></h2>
+    <p class="intro monte">Le même dossier, suivi d'un bout à l'autre. Fais défiler : la fiche à côté se met à jour comme elle le ferait dans ton Notion.</p>
+
+    <div class="parcours">
+      <ol class="etapes">
+        <li data-s="0"><h3>Tu prépares le devis</h3><p>Tu le crées dans la base Devis et tu le relies au client. Il reste en brouillon tant qu'il n'est pas parti.</p></li>
+        <li data-s="1"><h3>Tu l'envoies, tu notes la relance</h3><p>Statut « Envoyé », date d'envoi, et une date de relance trois à cinq jours plus tard.</p></li>
+        <li data-s="2"><h3>Lundi, il apparaît dans « À relancer »</h3><p>La date est passée, pas de réponse : la vue te le présente. Tu copies le message de relance et tu l'adaptes.</p></li>
+        <li data-s="3"><h3>Le client accepte</h3><p>Le devis passe en « Accepté ». Tu crées la facture dans la troisième base, reliée au client et au devis.</p></li>
+        <li data-s="4"><h3>Un acompte arrive</h3><p>Tu saisis seulement ce qui est vraiment arrivé sur ton compte. Le reste à encaisser se calcule tout seul.</p></li>
+        <li data-s="5"><h3>Le solde est réglé</h3><p>Reste à encaisser : zéro. Le dossier est complet, du premier contact au dernier virement.</p></li>
+      </ol>
+
+      <div class="scene" aria-live="polite">
+        <div class="fiche">
+          <div class="ent"><b id="f-titre">Devis D-0012</b><span class="mono" id="f-base">BASE DEVIS</span></div>
+          <dl>
+            <div class="ligne"><dt>Client</dt><dd>Atelier Marnier</dd></div>
+            <div class="ligne"><dt>Statut</dt><dd><span class="puce brouillon" id="f-statut">Brouillon</span></dd></div>
+            <div class="ligne"><dt id="f-l1">Montant proposé</dt><dd class="mono" id="f-v1">2 400,00 €</dd></div>
+            <div class="ligne"><dt id="f-l2">Relance prévue</dt><dd class="mono" id="f-v2">—</dd></div>
+            <div class="ligne"><dt>Montant reçu</dt><dd class="mono" id="f-recu">0,00 €</dd></div>
+          </dl>
+          <div class="compteur"><span>Reste à encaisser</span><strong id="f-reste">—</strong></div>
+          <p class="legende">EXEMPLE FICTIF · MÊMES CHAMPS ET MÊME FORMULE QUE LE MODÈLE</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- RELANCES -->
+<section class="bloc" id="relances" style="padding-top:0">
+  <div class="wrap">
+    <p class="folio monte"><b>Folio 03</b><span>Les messages</span></p>
+    <h2 class="monte">Trois relances, <em>déjà écrites.</em></h2>
+    <p class="intro monte">Polies, courtes, et qui laissent une porte ouverte. Tu remplaces ce qui est entre crochets et tu envoies depuis ta propre messagerie.</p>
+
+    <div class="lettres">
+      <article class="lettre monte">
+        <div class="quand"><span>Relance de devis · 3 à 5 jours après l'envoi</span>
+          <button class="copier" data-copie="l1"><svg aria-hidden="true"><use href="#i-copie"/></svg><span>Copier</span></button></div>
+        <div id="l1">
+          <p>Bonjour <mark>[Prénom]</mark>,</p>
+          <p>Je reviens vers vous au sujet de ma proposition pour <mark>[projet]</mark>. Avez-vous eu le temps de la parcourir&nbsp;?</p>
+          <p>Je peux clarifier le périmètre, les étapes ou adapter la proposition à vos priorités. Si vous préférez, nous pouvons en parler en 10 minutes.</p>
+          <p>Bonne journée,<br><mark>[Signature]</mark></p>
+        </div>
+      </article>
+      <div class="pile">
+        <article class="lettre monte" aria-label="Aperçu : relance avant expiration du devis">
+          <div class="quand"><span>Avant expiration du devis</span></div>
+          <p>Bonjour <mark>[Prénom]</mark>, la proposition <mark>[référence]</mark> arrive à échéance le <mark>[date]</mark>. Souhaitez-vous que je maintienne le créneau prévu…</p>
+          <span class="inclus">Texte complet dans le kit</span>
+        </article>
+        <article class="lettre monte" aria-label="Aperçu : rappel de paiement après échéance">
+          <div class="quand"><span>Rappel de paiement · après l'échéance</span></div>
+          <p>Bonjour <mark>[Prénom]</mark>, sauf erreur de ma part, la facture <mark>[référence]</mark>, d'un montant de <mark>[montant]</mark>…</p>
+          <span class="inclus">Texte complet dans le kit</span>
+        </article>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SEMAINE -->
+<section class="bloc" style="padding-top:0">
+  <div class="wrap">
+    <p class="folio monte"><b>Folio 04</b><span>La routine</span></p>
+    <h2 class="monte">Quinze minutes <em>par semaine.</em></h2>
+    <div class="semaine">
+      <div class="jour monte"><h3>Lundi</h3><p>Les devis envoyés restés sans réponse : tu programmes les relances.</p><span class="mono">5 MIN · VUE À RELANCER</span></div>
+      <div class="jour monte"><h3>Mercredi</h3><p>Les réponses des clients, les devis acceptés, les échéances qui approchent.</p><span class="mono">5 MIN · VUE PIPELINE</span></div>
+      <div class="jour monte"><h3>Vendredi</h3><p>Tu rapproches les paiements vraiment reçus de tes factures et tu ranges les PDF.</p><span class="mono">5 MIN · FACTURES</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- 2027 -->
+<section class="bloc" style="padding-top:0">
+  <div class="wrap">
+    <p class="folio monte"><b>Folio 05</b><span>Facture électronique</span></p>
+    <h2 class="monte">Prêt pour <em>septembre 2027.</em></h2>
+    <div class="c2027">
+      <div class="aiguillage monte" role="table" aria-label="Canal 2027 selon le type de client">
+        <div class="t" role="row"><span role="columnheader">Type de client</span><span role="columnheader">Canal 2027</span></div>
+        <div class="r" role="row"><span role="cell">Professionnel en France</span><svg aria-hidden="true"><use href="#i-rail"/></svg><span class="mono" role="cell">Facture électronique</span></div>
+        <div class="r" role="row"><span role="cell">Particulier</span><svg aria-hidden="true"><use href="#i-rail"/></svg><span class="mono" role="cell">E-reporting</span></div>
+        <div class="r" role="row"><span role="cell">Étranger</span><svg aria-hidden="true"><use href="#i-rail"/></svg><span class="mono" role="cell">E-reporting</span></div>
+      </div>
+      <div class="txt monte">
+        <p>Depuis le 1<sup>er</sup> septembre 2026, toutes les entreprises en France doivent pouvoir recevoir des factures électroniques. L'émission devient obligatoire le 1<sup>er</sup> septembre 2027 pour les micro-entreprises et les PME.</p>
+        <p>Le kit range déjà chaque client dans le bon canal, grâce à la colonne « Canal 2027 », et une page te donne les étapes à cocher, avec les sources officielles.</p>
+        <p class="mono">Le kit ne remplace pas une plateforme agréée : il t'aide à t'y préparer.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- LIMITES -->
+<section class="bloc" style="padding-top:0">
+  <div class="wrap">
+    <p class="folio monte"><b>Folio 06</b><span>Pour être clair</span></p>
+    <h2 class="monte">Ce que le kit <em>ne fait pas.</em></h2>
+    <div class="limites monte">
+      <div><h3><svg aria-hidden="true"><use href="#i-non"/></svg>Pas de facture PDF</h3><p>Il suit tes factures, il ne les génère pas. Tu gardes ton outil de facturation et tu colles le lien du PDF.</p></div>
+      <div><h3><svg aria-hidden="true"><use href="#i-non"/></svg>Pas d'envoi automatique</h3><p>Les relances sont écrites pour toi, c'est toi qui les envoies, depuis ta messagerie.</p></div>
+      <div><h3><svg aria-hidden="true"><use href="#i-non"/></svg>Pas de banque connectée</h3><p>Tu saisis toi-même ce qui est arrivé. C'est volontaire : un montant attendu n'est pas un revenu.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ACHAT -->
+<section class="bloc achat" id="achat">
+  <div class="wrap">
+    <p class="folio monte"><b>Folio 07</b><span>Le prix</span></p>
+    <h2 class="monte">Un seul paiement, <em>ton espace pour toujours.</em></h2>
+    <p class="intro monte">Pas d'abonnement. Tu achètes le modèle une fois, il est copié dans ton propre Notion et il t'appartient.</p>
+
+    <div class="billet monte">
+      <div class="g">
+        <p class="mono" style="font-size:12px;letter-spacing:.12em;color:var(--graphite)">KIT FREELANCE · VERSION 1</p>
+        <div class="prix"><strong>12</strong><span>USD</span></div>
+        <p class="mono" style="font-size:13px;color:var(--graphite)">Paiement unique, en dollars américains, par Stripe.</p>
+        <ul>
+          <li><svg aria-hidden="true"><use href="#i-ok"/></svg>Trois bases reliées : Clients, Devis, Factures et encaissements</li>
+          <li><svg aria-hidden="true"><use href="#i-ok"/></svg>Vues « À relancer » et « Pipeline » déjà réglées</li>
+          <li><svg aria-hidden="true"><use href="#i-ok"/></svg>Trois messages de relance à copier</li>
+          <li><svg aria-hidden="true"><use href="#i-ok"/></svg>Module « Prêt pour 2027 » et colonne Canal 2027</li>
+          <li><svg aria-hidden="true"><use href="#i-ok"/></svg>Guide d'utilisation pas à pas</li>
+        </ul>
+      </div>
+      <div class="g d">
+        <ol>
+          <li>Tu paies 12 USD sur la page sécurisée de Stripe.</li>
+          <li>Sous deux jours ouvrés, tu reçois un e-mail avec le lien du modèle.</li>
+          <li>Tu cliques sur « Dupliquer » : le kit est dans ton Notion.</li>
+        </ol>
+        <a class="btn" href="https://buy.stripe.com/dRm4gr89T9ataxM0iL9fW00">Acheter le kit · 12 USD <svg aria-hidden="true"><use href="#i-fleche"/></svg></a>
+        <small>Il te faut un compte Notion, gratuit suffit. Livraison manuelle par e-mail, pas de téléchargement immédiat. Tu disposes de 14 jours pour changer d'avis : écris-nous et tu es remboursé.</small>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section class="bloc">
+  <div class="wrap">
+    <p class="folio monte"><b>Folio 08</b><span>Questions</span></p>
+    <h2 class="monte">Avant <em>d'acheter.</em></h2>
+    <div class="faq">
+      <details><summary>Faut-il un abonnement Notion payant&nbsp;?<svg aria-hidden="true"><use href="#i-plus"/></svg></summary><p>Non. Le modèle fonctionne avec un compte Notion gratuit, sur ordinateur et sur téléphone.</p></details>
+      <details><summary>Pourquoi la livraison n'est-elle pas immédiate&nbsp;?<svg aria-hidden="true"><use href="#i-plus"/></svg></summary><p>Chaque commande est vérifiée puis le lien de duplication est envoyé à la main, par e-mail, sous deux jours ouvrés. C'est ce qui est indiqué au moment du paiement.</p></details>
+      <details><summary>Est-ce que ça remplace mon logiciel de facturation&nbsp;?<svg aria-hidden="true"><use href="#i-plus"/></svg></summary><p>Non. Le kit sert à suivre et à relancer. Tes factures conformes restent faites par ton outil habituel ; tu colles simplement le lien du PDF dans la fiche.</p></details>
+      <details><summary>Je ne suis pas en France, ça marche quand même&nbsp;?<svg aria-hidden="true"><use href="#i-plus"/></svg></summary><p>Oui pour le suivi des clients, des devis et des paiements. Le module 2027 et le SIREN concernent la France ; tu peux les ignorer.</p></details>
+      <details><summary>Et si le kit ne me convient pas&nbsp;?<svg aria-hidden="true"><use href="#i-plus"/></svg></summary><p>Tu as 14 jours pour te rétracter. Écris à l'adresse ci-dessous et tu es remboursé.</p></details>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <div>
+      <p>AGORA Kits · Kit Freelance, modèle Notion</p>
+      <p>Contact : <a href="mailto:contact@okeysho.com">contact@okeysho.com</a></p>
+      <p>Polices Cardo, Anonymous Pro et Anton sous licence SIL Open Font License, hébergées avec le site.</p>
+    </div>
+    <div>
+      <p class="proto">PROTOTYPE NON PUBLIÉ · mentions légales à compléter avant mise en vente publique : éditeur, statut et SIREN, adresse, régime de TVA. Hébergeur : Vercel Inc.</p>
+      <p>Notion est une marque de Notion Labs, Inc. Ce kit n'est ni édité ni approuvé par Notion.</p>
+    </div>
+  </div>
+</footer>
+
+<script>
+document.documentElement.classList.add('js');
+document.body.classList.add('js');
+(function(){
+  var reduit = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // apparitions
+  var io = new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){e.target.classList.add('vu');io.unobserve(e.target);}})},{rootMargin:'0px 0px -8% 0px'});
+  document.querySelectorAll('.monte').forEach(function(el){io.observe(el)});
+  var t = document.querySelector('.tampon'); if(t) t.classList.add('pose');
+
+  // onglets accessibles
+  var tabs = [].slice.call(document.querySelectorAll('[role=tab]'));
+  function choisir(tab){tabs.forEach(function(x){var on=x===tab;x.setAttribute('aria-selected',on);x.tabIndex=on?0:-1;document.getElementById(x.getAttribute('aria-controls')).hidden=!on;});}
+  tabs.forEach(function(tab,i){
+    tab.addEventListener('click',function(){choisir(tab)});
+    tab.addEventListener('keydown',function(e){var d={ArrowDown:1,ArrowRight:1,ArrowUp:-1,ArrowLeft:-1}[e.key];if(!d)return;e.preventDefault();var n=tabs[(i+d+tabs.length)%tabs.length];choisir(n);n.focus();});
+  });
+
+  // parcours : la fiche suit les étapes
+  var etats = [
+    {titre:'Devis D-0012',base:'BASE DEVIS',statut:['Brouillon','brouillon'],l1:'Montant proposé',v1:'2 400,00 €',l2:'Relance prévue',v2:'—',recu:'—',reste:'—'},
+    {titre:'Devis D-0012',base:'BASE DEVIS',statut:['Envoyé','envoye'],l1:'Montant proposé',v1:'2 400,00 €',l2:'Relance prévue',v2:'04/12',recu:'—',reste:'—'},
+    {titre:'Devis D-0012',base:'VUE À RELANCER',statut:['Relancé','relance'],l1:'Montant proposé',v1:'2 400,00 €',l2:'Relance prévue',v2:'04/12 · passée',recu:'—',reste:'—'},
+    {titre:'Facture F-0012',base:'BASE FACTURES',statut:['Envoyée','envoye'],l1:'Total TTC',v1:'2 400,00 €',l2:'Échéance',v2:'10/01',recu:'0,00 €',reste:2400},
+    {titre:'Facture F-0012',base:'BASE FACTURES',statut:['Partiellement payée','relance'],l1:'Total TTC',v1:'2 400,00 €',l2:'Échéance',v2:'10/01',recu:'720,00 €',reste:1680},
+    {titre:'Facture F-0012',base:'BASE FACTURES',statut:['Payée','paye'],l1:'Total TTC',v1:'2 400,00 €',l2:'Date d’encaissement',v2:'08/01',recu:'2 400,00 €',reste:0}
+  ];
+  var $=function(id){return document.getElementById(id)};
+  var fmt=function(n){return n.toLocaleString('fr-FR',{minimumFractionDigits:2,maximumFractionDigits:2}).replace(/ | /g,' ')+' €'};
+  var courant=-1, resteAff=null;
+  function animerReste(cible){
+    var el=$('f-reste');
+    if(typeof cible!=='number'){el.textContent='—';resteAff=null;return;}
+    if(reduit||resteAff===null){el.textContent=fmt(cible);resteAff=cible;return;}
+    var de=resteAff,t0=performance.now();
+    (function f(t){var p=Math.min(1,(t-t0)/600),v=de+(cible-de)*(1-Math.pow(1-p,3));el.textContent=fmt(Math.round(v));if(p<1)requestAnimationFrame(f);})(t0);
+    resteAff=cible;
+  }
+  function montrer(i){
+    if(i===courant)return;courant=i;var s=etats[i];
+    $('f-titre').textContent=s.titre;$('f-base').textContent=s.base;
+    var st=$('f-statut');st.textContent=s.statut[0];st.className='puce '+s.statut[1];
+    $('f-l1').textContent=s.l1;$('f-v1').textContent=s.v1;$('f-l2').textContent=s.l2;$('f-v2').textContent=s.v2;$('f-recu').textContent=s.recu;
+    animerReste(s.reste);
+    document.querySelectorAll('.etapes li').forEach(function(li){li.classList.toggle('on',+li.dataset.s===i)});
+  }
+  montrer(0);
+  var io2=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting)montrer(+e.target.dataset.s)})},{rootMargin: matchMedia('(max-width:900px)').matches ? '-66% 0px -18% 0px' : '-45% 0px -45% 0px'});
+  document.querySelectorAll('.etapes li').forEach(function(li){io2.observe(li)});
+
+  // copier la relance
+  document.querySelectorAll('.copier').forEach(function(b){
+    b.addEventListener('click',function(){
+      var txt=[].slice.call(document.getElementById(b.dataset.copie).querySelectorAll('p')).map(function(p){return p.innerText}).join('\n\n');
+      var lab=b.querySelector('span');
+      (navigator.clipboard?navigator.clipboard.writeText(txt):Promise.reject()).then(function(){lab.textContent='Copié'},function(){lab.textContent='Sélectionne le texte'});
+      setTimeout(function(){lab.textContent='Copier'},2000);
+    });
+  });
+})();
+</script>
+</body>
+</html>
