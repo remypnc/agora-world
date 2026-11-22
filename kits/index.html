@@ -94,8 +94,7 @@ h1 em{font-style:italic;color:var(--carbone)}
   border:4px solid var(--tampon);padding:2px 14px 0;line-height:1.15;transform:rotate(-9deg);mix-blend-mode:multiply;opacity:.9;
   -webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='120'%3E%3Cfilter id='r'%3E%3CfeTurbulence baseFrequency='.9' numOctaves='2'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -2.4 1.7'/%3E%3C/filter%3E%3Crect width='300' height='120' filter='url(%23r)'/%3E%3C/svg%3E") 0 0/100% 100%;
   mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='120'%3E%3Cfilter id='r'%3E%3CfeTurbulence baseFrequency='.9' numOctaves='2'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -2.4 1.7'/%3E%3C/filter%3E%3Crect width='300' height='120' filter='url(%23r)'/%3E%3C/svg%3E") 0 0/100% 100%}
-.js .tampon{opacity:0;transform:rotate(-9deg) scale(1.9)}
-.js .tampon.pose{animation:pose .45s var(--ease) .9s forwards}
+
 @keyframes pose{0%{opacity:0;transform:rotate(-14deg) scale(1.9)}70%{opacity:.95;transform:rotate(-8deg) scale(.96)}100%{opacity:.9;transform:rotate(-9deg) scale(1)}}
 .exemple{position:absolute;left:0;bottom:-34px;font-family:var(--mono);font-size:11px;color:var(--graphite);letter-spacing:.05em}
 
@@ -239,6 +238,53 @@ footer .wrap{display:grid;grid-template-columns:1fr 1fr;gap:28px}
 footer .proto{color:var(--tampon)}
 @media (max-width:700px){footer .wrap{grid-template-columns:1fr}}
 
+
+/* ---------- couche motion ---------- */
+.bar-d{display:flex;align-items:center;gap:14px}
+.pause{all:unset;cursor:pointer;font-family:var(--mono);font-size:11.5px;letter-spacing:.06em;color:var(--graphite);border-bottom:1px dotted currentColor;padding:2px 0}
+.pause[aria-pressed=true]{color:var(--tampon)}
+@media (max-width:560px){.pause{display:none}}
+.encre{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:0;opacity:.9}
+.hero .wrap{position:relative;z-index:1}
+.souligne{position:relative;display:inline-block}
+.souligne svg{position:absolute;left:0;right:0;bottom:-.08em;width:100%;height:.28em;overflow:visible}
+.souligne path{fill:none;stroke:var(--tampon);stroke-width:3.2;stroke-linecap:round;vector-effect:non-scaling-stroke}
+
+.scene3d{position:relative;justify-self:center;width:100%;max-width:520px;perspective:1600px;perspective-origin:50% 0%}
+.carnet3d{position:relative;aspect-ratio:4/4.3;transform-style:preserve-3d;transform:rotateX(14deg) rotateZ(-2deg);cursor:pointer}
+.reliure{position:absolute;left:-6px;right:-6px;top:-14px;height:22px;background:var(--encre);border-radius:3px 3px 0 0;transform:translateZ(8px);
+  box-shadow:0 2px 0 rgba(0,0,0,.25);background-image:radial-gradient(circle,var(--papier-2) 2.2px,transparent 2.6px);background-size:18px 22px;background-position:center}
+.page{position:absolute;inset:0;transform-origin:50% 0;transform-style:preserve-3d}
+.page .recto,.page .verso{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden}
+.page .recto{background:#FBF8F1;border:1px solid var(--papier-3);display:grid;grid-template-columns:28% 1fr;
+  box-shadow:0 30px 60px -30px rgba(26,34,56,.35),0 8px 18px -12px rgba(26,34,56,.25)}
+.page .verso{transform:rotateX(180deg);background:#E7E1F0;border:1px solid #D4CCE3;display:flex;align-items:flex-end;justify-content:flex-end;padding:18px;
+  background-image:repeating-linear-gradient(0deg,transparent 0 30px,rgba(63,58,143,.12) 30px 31px)}
+.page .verso span{font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--carbone);transform:scaleY(-1)}
+.p-client{z-index:3}.p-devis{z-index:2}.p-facture{z-index:1}
+.p-facture .recto{transform:translateZ(-2px)}
+/* sans JS ou animations réduites : le devis tamponné est devant */
+html:not(.anim) .p-client{display:none}
+.tampon.t-paye{color:var(--vert);border-color:var(--vert);right:10%;bottom:24%;display:flex;align-items:center;gap:8px}
+.coche{width:.9em;height:.7em}
+.coche path{fill:none;stroke:currentColor;stroke-width:6;stroke-linecap:round;stroke-linejoin:round}
+.etapes3d{margin-top:34px;display:flex;gap:18px;font-family:var(--mono);font-size:11.5px;letter-spacing:.08em;color:var(--graphite);flex-wrap:wrap;position:relative;padding-bottom:10px}
+.etapes3d span.on{color:var(--encre)}
+.etapes3d i{position:absolute;left:0;right:0;bottom:0;height:1px;background:var(--papier-3)}
+.etapes3d b{position:absolute;left:0;top:0;bottom:0;width:0;background:var(--encre)}
+.scene3d .exemple{position:static;margin-top:10px}
+.mini-tampon{position:absolute;z-index:20;pointer-events:none;font-family:var(--stamp);font-size:20px;letter-spacing:.04em;padding:1px 8px 0;border:3px solid currentColor;
+  line-height:1.15;mix-blend-mode:multiply;white-space:nowrap}
+.ruban{background:var(--encre);color:var(--papier);overflow:hidden;border-block:1px solid var(--encre);margin-top:clamp(0px,2vw,24px)}
+.defile{display:flex;width:max-content;animation:defile 38s linear infinite}
+.defile span{font-family:var(--mono);font-size:13px;letter-spacing:.14em;text-transform:uppercase;padding:14px 26px;position:relative}
+.defile span::after{content:"";position:absolute;right:-3px;top:50%;width:6px;height:6px;margin-top:-3px;border:1px solid #6D74A0;transform:rotate(45deg)}
+@keyframes defile{to{transform:translateX(-50%)}}
+.arret .defile{animation-play-state:paused}
+.ligne-split{overflow:hidden;padding-bottom:.06em;margin-bottom:-.06em}
+@media (max-width:900px){.carnet3d{transform:rotateX(10deg) rotateZ(-1.5deg)}.page .verso{visibility:hidden}.tampon.t-paye{bottom:9%;right:7%}.tampon.t-relance{bottom:11%}}
+@media (prefers-reduced-motion:reduce){.defile{animation:none}}
+
 /* apparitions */
 .js .monte{opacity:0;transform:translateY(22px);transition:opacity .8s var(--ease),transform .8s var(--ease)}
 .js .monte.vu{opacity:1;transform:none}
@@ -267,17 +313,19 @@ footer .proto{color:var(--tampon)}
       <a href="#relances">Les relances</a>
       <a href="#achat">Le prix</a>
     </nav>
-    <a class="btn sm" href="https://buy.stripe.com/dRm4gr89T9ataxM0iL9fW00">Acheter · 12 USD</a>
+    <div class="bar-d"><button class="pause" type="button" aria-pressed="false"><span>Pause animations</span></button>
+    <a class="btn sm" href="https://buy.stripe.com/dRm4gr89T9ataxM0iL9fW00">Acheter · 12 USD</a></div>
   </div>
 </header>
 
 <main id="contenu">
 <!-- HÉROS -->
 <section class="hero" id="top">
+  <canvas class="encre" aria-hidden="true"></canvas>
   <div class="wrap">
     <div>
       <p class="kicker"><i></i>Modèle Notion pour indépendants</p>
-      <h1>Le carnet à souches <em>des indépendants.</em></h1>
+      <h1>Le carnet à souches <em>des <span class="souligne">indépendants.<svg viewBox="0 0 400 30" preserveAspectRatio="none" aria-hidden="true"><path d="M4 18 C 70 8, 140 26, 210 14 S 330 6, 396 16"/></svg></span></em></h1>
       <p class="lead">Tes clients, tes devis, tes factures et l'argent vraiment arrivé sur ton compte, reliés dans un seul espace Notion. Avec trois relances déjà écrites et une routine de quinze minutes par semaine.</p>
       <div class="cta">
         <a class="btn" href="https://buy.stripe.com/dRm4gr89T9ataxM0iL9fW00">Acheter le kit · 12 USD <svg aria-hidden="true"><use href="#i-fleche"/></svg></a>
@@ -286,34 +334,78 @@ footer .proto{color:var(--tampon)}
       <p class="note">Paiement unique par Stripe. Le modèle t'est envoyé par e-mail sous deux jours ouvrés, avec son lien de duplication.</p>
     </div>
 
-    <div class="carnet" aria-label="Illustration : une souche de devis du modèle, avec un tampon À relancer">
-      <div class="feuille double" aria-hidden="true">
-        <div class="talon"><div class="n">Devis<strong>D-0012</strong></div><div class="mini">Relance<br>04/12</div></div>
-        <div class="corps"><h3>Devis</h3></div>
+    <div class="scene3d">
+      <div class="carnet3d" id="carnet" role="img" aria-label="Un carnet à souches : la fiche client, le devis tamponné À relancer, puis la facture tamponnée Payée">
+        <div class="reliure" aria-hidden="true"></div>
+
+        <article class="page p-facture" aria-hidden="true">
+          <div class="recto">
+            <div class="talon"><div class="n">Facture n°<strong>F-0012</strong></div><div class="mini">Encaissé<br>08/01</div></div>
+            <div class="corps">
+              <h3>Facture <small>BASE FACTURES</small></h3>
+              <dl>
+                <div class="ligne"><dt>Client</dt><dd>Atelier Marnier</dd></div>
+                <div class="ligne"><dt>Total TTC</dt><dd class="mono">2 400,00 €</dd></div>
+                <div class="ligne"><dt>Montant reçu</dt><dd class="mono" id="h-recu">2 400,00 €</dd></div>
+                <div class="ligne"><dt>Reste à encaisser</dt><dd class="mono" id="h-reste">0,00 €</dd></div>
+                <div class="ligne"><dt>Statut</dt><dd><span class="puce paye">Payée</span></dd></div>
+              </dl>
+              <p class="pied">MOYEN DE PAIEMENT · VIREMENT</p>
+            </div>
+            <div class="tampon t-paye"><svg class="coche" viewBox="0 0 60 40" aria-hidden="true"><path d="M4 22 C10 26 16 31 21 36 C30 22 42 10 56 4"/></svg>PAYÉ</div>
+          </div>
+        </article>
+
+        <article class="page p-devis" aria-hidden="true">
+          <div class="recto">
+            <div class="talon"><div class="n">Devis n°<strong>D-0012</strong></div><div class="mini">Envoyé 28/11<br>Relance 04/12</div></div>
+            <div class="corps">
+              <h3>Devis <small>BASE DEVIS</small></h3>
+              <dl>
+                <div class="ligne"><dt>Client</dt><dd>Atelier Marnier</dd></div>
+                <div class="ligne"><dt>Objet</dt><dd>Refonte du site vitrine</dd></div>
+                <div class="ligne"><dt>Montant proposé</dt><dd class="mono">2 400,00 €</dd></div>
+                <div class="ligne"><dt>Relance prévue</dt><dd class="mono">04/12</dd></div>
+                <div class="ligne"><dt>Statut</dt><dd><span class="puce envoye">Envoyé</span></dd></div>
+              </dl>
+              <p class="pied">PROCHAINE ÉTAPE · APPELER SI PAS DE RÉPONSE</p>
+            </div>
+            <div class="tampon t-relance">À RELANCER</div>
+          </div>
+          <div class="verso"><span>double carbone</span></div>
+        </article>
+
+        <article class="page p-client" aria-hidden="true">
+          <div class="recto">
+            <div class="talon"><div class="n">Client<strong>C-0004</strong></div><div class="mini">Source<br>Recommandation</div></div>
+            <div class="corps">
+              <h3>Client <small>BASE CLIENTS</small></h3>
+              <dl>
+                <div class="ligne"><dt>Client</dt><dd>Atelier Marnier</dd></div>
+                <div class="ligne"><dt>Type de client</dt><dd>Professionnel en France</dd></div>
+                <div class="ligne"><dt>Statut</dt><dd><span class="puce relance">Prospect</span></dd></div>
+                <div class="ligne"><dt>Prochaine action</dt><dd>Envoyer le devis</dd></div>
+                <div class="ligne"><dt>Date de suivi</dt><dd class="mono">28/11</dd></div>
+              </dl>
+              <p class="pied">DEVIS · FACTURES · RELIÉS</p>
+            </div>
+          </div>
+          <div class="verso"><span>double carbone</span></div>
+        </article>
       </div>
-      <div class="feuille">
-        <div class="talon">
-          <div class="n">Devis n°<strong>D-0012</strong></div>
-          <div class="mini">Talon conservé<br>Envoyé 28/11<br>Relance 04/12</div>
-        </div>
-        <div class="corps">
-          <h3>Devis <small>BASE DEVIS</small></h3>
-          <dl>
-            <div class="ligne"><dt>Client</dt><dd>Atelier Marnier</dd></div>
-            <div class="ligne"><dt>Objet</dt><dd>Refonte du site vitrine</dd></div>
-            <div class="ligne"><dt>Montant proposé</dt><dd class="mono">2 400,00 €</dd></div>
-            <div class="ligne"><dt>Envoyé le</dt><dd class="mono">28/11</dd></div>
-            <div class="ligne"><dt>Relance prévue</dt><dd class="mono">04/12</dd></div>
-            <div class="ligne"><dt>Statut</dt><dd><span class="puce envoye">Envoyé</span></dd></div>
-          </dl>
-          <p class="pied">PROCHAINE ÉTAPE · APPELER SI PAS DE RÉPONSE</p>
-        </div>
+      <div class="etapes3d" aria-hidden="true">
+        <span class="on">01 Client</span><span>02 Devis</span><span>03 Facture</span>
+        <i><b id="barre"></b></i>
       </div>
-      <div class="tampon" aria-hidden="true">À RELANCER</div>
-      <p class="exemple">Exemple fictif · champs réels du modèle</p>
+      <p class="exemple">Exemple fictif · champs réels du modèle · touche le carnet pour tamponner</p>
     </div>
   </div>
 </section>
+
+<div class="ruban" aria-hidden="true"><div class="defile">
+  <span>Brouillon</span><span>Envoyé</span><span>Relancé</span><span>Accepté</span><span>À émettre</span><span>Envoyée</span><span>Partiellement payée</span><span>Payée</span>
+  <span>Brouillon</span><span>Envoyé</span><span>Relancé</span><span>Accepté</span><span>À émettre</span><span>Envoyée</span><span>Partiellement payée</span><span>Payée</span>
+</div></div>
 
 <!-- BASES -->
 <section class="bloc" id="bases">
@@ -569,7 +661,6 @@ document.body.classList.add('js');
   // apparitions
   var io = new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){e.target.classList.add('vu');io.unobserve(e.target);}})},{rootMargin:'0px 0px -8% 0px'});
   document.querySelectorAll('.monte').forEach(function(el){io.observe(el)});
-  var t = document.querySelector('.tampon'); if(t) t.classList.add('pose');
 
   // onglets accessibles
   var tabs = [].slice.call(document.querySelectorAll('[role=tab]'));
@@ -621,6 +712,154 @@ document.body.classList.add('js');
     });
   });
 })();
+</script>
+<script src="vendor/gsap/gsap.min.js"></script>
+<script src="vendor/gsap/ScrollTrigger.min.js"></script>
+<script src="vendor/gsap/SplitText.min.js"></script>
+<script src="vendor/gsap/DrawSVGPlugin.min.js"></script>
+<script>
+(function(){
+  if(!window.gsap) return;
+  gsap.registerPlugin(ScrollTrigger, SplitText, DrawSVGPlugin);
+  var html=document.documentElement;
+  var reduit=matchMedia('(prefers-reduced-motion: reduce)').matches;
+  window.AGORA_PAUSE=false;
+
+  // bouton pause : arrête tout (GSAP, ruban, encre)
+  var bp=document.querySelector('.pause');
+  if(bp) bp.addEventListener('click',function(){
+    var on=bp.getAttribute('aria-pressed')!=='true';
+    bp.setAttribute('aria-pressed',on); bp.querySelector('span').textContent=on?'Reprendre les animations':'Pause animations';
+    window.AGORA_PAUSE=on; html.classList.toggle('arret',on);
+    on?gsap.globalTimeline.pause():gsap.globalTimeline.resume();
+  });
+
+  if(reduit) return;
+  html.classList.add('anim');
+
+  // soulignement à la main sous le titre
+  gsap.from('.souligne path',{drawSVG:'0%',duration:1.1,delay:.5,ease:'power2.inOut'});
+
+  // titres : lignes qui montent une à une
+  document.querySelectorAll('h2').forEach(function(h){
+    var st=SplitText.create(h,{type:'lines',mask:'lines',linesClass:'ligne-split'});
+    gsap.from(st.lines,{yPercent:105,duration:.9,ease:'power3.out',stagger:.09,scrollTrigger:{trigger:h,start:'top 85%'}});
+    h.classList.remove('monte');
+  });
+
+  // carnet 3D : client, devis, facture
+  var pages={c:document.querySelector('.p-client'),d:document.querySelector('.p-devis'),f:document.querySelector('.p-facture')};
+  var tR=document.querySelector('.t-relance'), tP=document.querySelector('.t-paye');
+  var etiq=[].slice.call(document.querySelectorAll('.etapes3d span'));
+  function etape(i){etiq.forEach(function(e,j){e.classList.toggle('on',j===i)})}
+  gsap.set([tR,tP],{opacity:0,scale:1.9,rotate:-14});
+  var recu={v:0}, elRecu=document.getElementById('h-recu'), elReste=document.getElementById('h-reste');
+  var eur=function(n){return n.toLocaleString('fr-FR',{minimumFractionDigits:2,maximumFractionDigits:2})+' €'};
+  var tl=gsap.timeline({defaults:{ease:'power2.inOut'},paused:true});
+  tl.addLabel('client')
+    .to(pages.c,{rotateX:-178,y:-6,duration:1.2,onStart:function(){etape(1)},onReverseComplete:function(){etape(0)}},'+=0.4')
+    .set(pages.c,{zIndex:0})
+    .to(tR,{opacity:.92,scale:1,rotate:-9,duration:.35,ease:'back.out(2.2)'},'-=0.25')
+    .to('.p-devis .puce',{color:'#B7802A',duration:.2},'<')
+    .to(pages.d,{rotateX:-178,y:-6,duration:1.2,onStart:function(){etape(2)},onReverseComplete:function(){etape(1)}},'+=0.9')
+    .set(pages.d,{zIndex:0})
+    .fromTo(recu,{v:0},{v:2400,duration:.9,ease:'power1.out',onUpdate:function(){elRecu.textContent=eur(Math.round(recu.v));elReste.textContent=eur(2400-Math.round(recu.v))}},'-=0.4')
+    .to(tP,{opacity:.92,scale:1,rotate:-7,duration:.35,ease:'back.out(2.2)'})
+    .from('.coche path',{drawSVG:'0%',duration:.45,ease:'power2.out'},'-=0.1')
+    .to({},{duration:.6});
+  gsap.set(elRecu,{textContent:eur(0)}); elReste.textContent=eur(2400);
+
+  var barre=document.getElementById('barre');
+  var mm=gsap.matchMedia();
+  mm.add('(min-width: 901px)',function(){
+    // ordinateur : le carnet suit le défilement, le héros reste épinglé
+    var st=ScrollTrigger.create({trigger:'.hero',start:'top top+=60',end:'+=1300',pin:true,scrub:.6,animation:tl,
+      onUpdate:function(self){barre.style.width=(self.progress*100)+'%'}});
+    return function(){st.kill()};
+  });
+  mm.add('(max-width: 900px)',function(){
+    // téléphone : la séquence joue seule quand le carnet est visible, puis recommence
+    var boucle=gsap.timeline({repeat:-1,repeatDelay:1.4,paused:true});
+    boucle.add(tl.tweenFromTo(0,tl.duration(),{ease:'none'}))
+          .to([pages.c,pages.d],{rotateX:0,y:0,duration:.7,ease:'power2.inOut',onStart:function(){gsap.set(pages.c,{zIndex:3});gsap.set(pages.d,{zIndex:2});}},'+=1.2')
+          .to([tR,tP],{opacity:0,duration:.3},'<');
+    boucle.eventCallback('onUpdate',function(){barre.style.width=Math.min(100,boucle.progress()*118)+'%'});
+    var st=ScrollTrigger.create({trigger:'#carnet',start:'top 85%',end:'bottom 10%',onToggle:function(self){self.isActive?boucle.play():boucle.pause()}});
+    return function(){st.kill();boucle.kill()};
+  });
+
+  // toucher le carnet = tamponner
+  var carnet=document.getElementById('carnet'), mots=[['À RELANCER','#C8432B'],['PAYÉ','#2F6B4F'],['VU','#3F3A8F'],['ACCEPTÉ','#2F6B4F']], k=0;
+  carnet.addEventListener('pointerdown',function(e){
+    var r=carnet.getBoundingClientRect(), m=mots[k++%mots.length], d=document.createElement('span');
+    d.className='mini-tampon'; d.textContent=m[0]; d.style.color=m[1];
+    d.style.left=(e.clientX-r.left)+'px'; d.style.top=(e.clientY-r.top)+'px';
+    carnet.appendChild(d);
+    gsap.fromTo(d,{xPercent:-50,yPercent:-50,scale:2.2,opacity:0,rotate:gsap.utils.random(-18,6)},{scale:1,opacity:.9,duration:.28,ease:'back.out(2.5)'});
+    gsap.to(d,{opacity:0,duration:.6,delay:1.8,onComplete:function(){d.remove()}});
+  });
+
+  // bouton magnétique (ordinateur seulement)
+  if(matchMedia('(pointer:fine)').matches){
+    document.querySelectorAll('.btn:not(.sm)').forEach(function(b){
+      var xT=gsap.quickTo(b,'x',{duration:.4,ease:'power3'}), yT=gsap.quickTo(b,'y',{duration:.4,ease:'power3'});
+      b.addEventListener('pointermove',function(e){var r=b.getBoundingClientRect();xT((e.clientX-r.left-r.width/2)*.18);yT((e.clientY-r.top-r.height/2)*.3)});
+      b.addEventListener('pointerleave',function(){xT(0);yT(0)});
+    });
+  }
+})();
+</script>
+
+<script type="module">
+// Encre carbone : le curseur laisse une trace violette qui s'efface, comme un papier carbone.
+// WebGL via OGL (Unlicense), ordinateur seulement, coupé si animations réduites ou en pause.
+if (matchMedia('(pointer:fine)').matches && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
+  const { Renderer } = await import('./vendor/ogl/core/Renderer.js');
+  const { Program } = await import('./vendor/ogl/core/Program.js');
+  const { Mesh } = await import('./vendor/ogl/core/Mesh.js');
+  const { Vec2 } = await import('./vendor/ogl/math/Vec2.js');
+  const { Triangle } = await import('./vendor/ogl/extras/Triangle.js');
+  const { Flowmap } = await import('./vendor/ogl/extras/Flowmap.js');
+  const canvas = document.querySelector('.encre'), hero = document.querySelector('.hero');
+  const renderer = new Renderer({ canvas, dpr: Math.min(devicePixelRatio, 2), alpha: true, premultipliedAlpha: true });
+  const gl = renderer.gl;
+  const flowmap = new Flowmap(gl, { falloff: 0.22, dissipation: 0.965, alpha: 0.6 });
+  const program = new Program(gl, {
+    vertex: `attribute vec2 uv; attribute vec2 position; varying vec2 vUv; void main(){ vUv = uv; gl_Position = vec4(position, 0., 1.); }`,
+    fragment: `precision highp float; uniform sampler2D tFlow; uniform float uTime; varying vec2 vUv;
+      float h(vec2 p){ return fract(sin(dot(p, vec2(12.9898,78.233))) * 43758.5453); }
+      void main(){
+        vec3 f = texture2D(tFlow, vUv).rgb;
+        float a = smoothstep(0.02, 0.6, length(f.xy)) * 0.26;
+        a *= 0.75 + 0.5 * h(floor(gl_FragCoord.xy * 0.5) + floor(uTime * 8.0));
+        gl_FragColor = vec4(vec3(0.247, 0.227, 0.561) * a, a);
+      }`,
+    uniforms: { tFlow: flowmap.uniform, uTime: { value: 0 } },
+    transparent: true,
+  });
+  const mesh = new Mesh(gl, { geometry: new Triangle(gl), program });
+  const size = () => { const r = hero.getBoundingClientRect(); renderer.setSize(r.width, r.height); flowmap.aspect = r.width / r.height; };
+  addEventListener('resize', size); size();
+  const mouse = new Vec2(-1), vel = new Vec2(); let last = null, visible = true;
+  new IntersectionObserver(([e]) => { visible = e.isIntersecting; }).observe(hero);
+  hero.addEventListener('pointermove', (e) => {
+    const r = hero.getBoundingClientRect();
+    mouse.set((e.clientX - r.left) / r.width, 1 - (e.clientY - r.top) / r.height);
+    const now = performance.now();
+    if (last) { const dt = Math.max(14, now - last.t); vel.set((e.clientX - last.x) / dt, (e.clientY - last.y) / dt); }
+    last = { x: e.clientX, y: e.clientY, t: now };
+  });
+  requestAnimationFrame(function loop(t) {
+    requestAnimationFrame(loop);
+    if (!visible || window.AGORA_PAUSE) return;
+    flowmap.mouse.copy(mouse);
+    flowmap.velocity.lerp(vel, vel.len() ? 0.5 : 0.1);
+    vel.multiply(0.9);
+    flowmap.update();
+    program.uniforms.uTime.value = t * 0.001;
+    renderer.render({ scene: mesh });
+  });
+}
 </script>
 </body>
 </html>

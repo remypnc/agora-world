@@ -1,0 +1,1 @@
+OGL 1.0.11 — Unlicense (domaine public), github.com/oframe/ogl
