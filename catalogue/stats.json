@@ -1,0 +1,43 @@
+{
+ "built": "2026-11-22",
+ "agents": 608,
+ "skills": 1029,
+ "mcp": 4998,
+ "sources": [
+  {
+   "repo": "https://github.com/VoltAgent/awesome-claude-code-subagents",
+   "kind": "agents",
+   "license": "MIT"
+  },
+  {
+   "repo": "https://github.com/msitarzewski/agency-agents",
+   "kind": "agents",
+   "license": "MIT"
+  },
+  {
+   "repo": "https://github.com/wshobson/agents",
+   "kind": "agents+skills",
+   "license": "MIT"
+  },
+  {
+   "repo": "https://github.com/anthropics/skills",
+   "kind": "skills",
+   "license": "voir chaque skill"
+  },
+  {
+   "repo": "https://github.com/ComposioHQ/awesome-claude-skills",
+   "kind": "skills",
+   "license": "non précisée"
+  },
+  {
+   "repo": "https://github.com/modelcontextprotocol/servers",
+   "kind": "mcp",
+   "license": "MIT / Apache-2.0"
+  },
+  {
+   "repo": "https://github.com/punkpeye/awesome-mcp-servers",
+   "kind": "mcp",
+   "license": "MIT"
+  }
+ ]
+}

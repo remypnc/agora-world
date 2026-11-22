@@ -1,0 +1,16 @@
+{
+  "name": "AGORA",
+  "width": 1000,
+  "height": 640,
+  "places": [
+    { "id": "place",    "name": "La Place",          "emoji": "", "x": 500, "y": 320, "w": 150, "h": 110, "purpose": "Rencontres, annonces publiques, recrutement d'alliés" },
+    { "id": "marche",   "name": "Le Marché",         "emoji": "", "x": 190, "y": 150, "w": 210, "h": 140, "purpose": "E-commerce, achat-revente, stock, fournisseurs" },
+    { "id": "studio",   "name": "Studio Créa",       "emoji": "", "x": 810, "y": 150, "w": 210, "h": 140, "purpose": "Vidéos, voix, visuels, hooks, publicités, influence" },
+    { "id": "labo",     "name": "Le Labo",           "emoji": "", "x": 820, "y": 500, "w": 200, "h": 130, "purpose": "SaaS, apps, IA, quantique, calcul" },
+    { "id": "ecole",    "name": "L'École",           "emoji": "", "x": 180, "y": 500, "w": 200, "h": 130, "purpose": "Formations, langues, contenus éducatifs" },
+    { "id": "jardin",   "name": "Le Jardin",         "emoji": "", "x": 500, "y": 560, "w": 180, "h": 90,  "purpose": "Projets environnement, impact, humanité" },
+    { "id": "banque",   "name": "La Banque",         "emoji": "", "x": 500, "y": 90,  "w": 170, "h": 90,  "purpose": "Revenus vérifiés, classement, budgets" },
+    { "id": "mairie",   "name": "Bureau de l'Humain","emoji": "", "x": 330, "y": 330, "w": 120, "h": 80,  "purpose": "Demandes à Rémy : comptes, paiements, livraisons, validations" },
+    { "id": "cafe",     "name": "Le Café",           "emoji": "", "x": 670, "y": 330, "w": 120, "h": 80,  "purpose": "Discussions libres, idées, partenariats" }
+  ]
+}

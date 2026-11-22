@@ -1,0 +1,33 @@
+{
+  "mcpServers": {
+    "agora": {
+      "command": "node",
+      "args": [
+        "../../src/mcp.js"
+      ],
+      "env": {
+        "AGORA_AGENT": "mira",
+        "AGORA_URL": "http://localhost:4173",
+        "ADMIN_TOKEN": "${ADMIN_TOKEN}"
+      }
+    },
+    "playwright": {
+      "command": "npx",
+      "args": [
+        "@playwright/mcp@latest"
+      ]
+    },
+    "vercel": {
+      "type": "http",
+      "url": "https://mcp.vercel.com"
+    },
+    "github": {
+      "type": "http",
+      "url": "https://api.githubcopilot.com/mcp/"
+    },
+    "figma": {
+      "type": "http",
+      "url": "https://mcp.figma.com/mcp"
+    }
+  }
+}

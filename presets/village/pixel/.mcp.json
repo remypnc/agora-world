@@ -1,0 +1,29 @@
+{
+  "mcpServers": {
+    "agora": {
+      "command": "node",
+      "args": [
+        "../../src/mcp.js"
+      ],
+      "env": {
+        "AGORA_AGENT": "pixel",
+        "AGORA_URL": "http://localhost:4173",
+        "ADMIN_TOKEN": "${ADMIN_TOKEN}"
+      }
+    },
+    "playwright": {
+      "command": "npx",
+      "args": [
+        "@playwright/mcp@latest"
+      ]
+    },
+    "figma": {
+      "type": "http",
+      "url": "https://mcp.figma.com/mcp"
+    },
+    "notion": {
+      "type": "http",
+      "url": "https://mcp.notion.com/mcp"
+    }
+  }
+}

@@ -1,0 +1,712 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Bestiodex — le bestiaire vivant</title>
+<meta name="description" content="Photographiez les animaux du monde et collectionnez-les en cartes, du commun au mythique.">
+<meta name="theme-color" content="#121C26">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700;900&family=Instrument+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #121C26; --ink-2: #4A5866; --ink-3: #8794A0; --paper: #E9EEEA; --card: #FFFFFF; --rule: #CBD5CF;
+    --commun: #7D8A94; --peu_commun: #3E8E5A; --rare: #2F6FD0; --epique: #7B3FC4; --legendaire: #D49A12; --mythique: #D2344F; --inconnu: #5A5F66;
+    --d: "Unbounded", "Arial Black", sans-serif; --f: "Instrument Sans", system-ui, sans-serif;
+  }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  [hidden] { display: none !important; }
+  html, body { margin: 0; background: var(--paper); color: var(--ink); font: 400 16px/1.45 var(--f); -webkit-text-size-adjust: 100%; }
+  :focus-visible { outline: 3px solid var(--rare); outline-offset: 2px; }
+  button { font: inherit; color: inherit; cursor: pointer; }
+  header { padding: max(18px, env(safe-area-inset-top)) 18px 6px; max-width: 980px; margin: 0 auto; display: flex; align-items: end; justify-content: space-between; gap: 12px; }
+  h1 { font: 900 28px/1 var(--d); margin: 0; letter-spacing: -.02em; }
+  .tally { display: flex; gap: 14px; text-align: right; }
+  .tally b { display: block; font: 700 22px/1 var(--d); }
+  .tally span { font-size: 12px; color: var(--ink-3); }
+  main { max-width: 980px; margin: 0 auto; padding: 0 16px 130px; }
+  nav.tabs { display: flex; justify-content: center; gap: 34px; border-bottom: 1px solid var(--rule); margin: 6px 0 12px; }
+  nav.tabs button { border: 0; background: none; padding: 10px 2px; font-weight: 700; color: var(--ink-3); position: relative; display: inline-flex; align-items: center; gap: 8px; }
+  nav.tabs svg { width: 19px; height: 19px; flex: none; }
+  nav.tabs button[aria-selected="true"] { color: var(--ink); }
+  nav.tabs button[aria-selected="true"]::after { content: ""; position: absolute; left: 0; right: 0; bottom: -1px; height: 3px; background: var(--ink); border-radius: 2px; }
+  .search { width: 100%; height: 44px; border: 0; border-radius: 12px; padding: 0 14px 0 40px; background: var(--card) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='18' height='18' fill='none' stroke='%238794A0' stroke-width='2.2' stroke-linecap='round'%3E%3Ccircle cx='8' cy='8' r='6'/%3E%3Cpath d='m13 13 4 4'/%3E%3C/svg%3E") 14px 50% no-repeat; box-shadow: inset 0 0 0 1.5px var(--rule); font: inherit; }
+  .search:focus { outline: none; box-shadow: inset 0 0 0 2px var(--ink); }
+  .chips { display: flex; gap: 8px; overflow-x: auto; padding: 10px 0; scrollbar-width: none; }
+  .chips::-webkit-scrollbar { display: none; }
+  .chip { flex: none; border: 0; border-radius: 999px; padding: 7px 13px; background: var(--card); box-shadow: inset 0 0 0 1.5px var(--rule); font-weight: 600; font-size: 14px; }
+  .chip[aria-pressed="true"] { background: var(--ink); color: #fff; box-shadow: none; }
+  .chip i { display: inline-block; width: 9px; height: 9px; border-radius: 50%; margin-right: 6px; vertical-align: 0; }
+  .dex { --cols: 3; display: grid; grid-template-columns: repeat(var(--cols), minmax(0, 1fr)); gap: 10px; touch-action: pan-y; }
+  .slot { position: relative; border: 0; padding: 0; background: none; text-align: left; }
+  .slot .pic { aspect-ratio: 1; border-radius: 14px; background: #1b2530 center / cover no-repeat; box-shadow: 0 0 0 3px var(--r, var(--commun)); position: relative; }
+  .slot .pic b { position: absolute; left: 6px; top: 6px; font: 700 10px/1 var(--d); color: #fff; background: rgba(0,0,0,.5); padding: 3px 5px; border-radius: 5px; }
+  .slot .pic em { position: absolute; right: 6px; bottom: 6px; font: 700 10px/1 var(--f); font-style: normal; color: var(--ink); background: #fff; padding: 3px 5px; border-radius: 5px; }
+  .slot .nm { font: 700 12px/1.2 var(--d); margin-top: 8px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .slot .sb { font-size: 12px; color: var(--ink-2); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .dex.dense { gap: 5px; }
+  .dex.dense .slot .pic { border-radius: 7px; box-shadow: 0 0 0 2px var(--r); }
+  .dex.dense .slot .nm, .dex.dense .slot .sb, .dex.dense .slot .pic b, .dex.dense .slot .pic em { display: none; }
+  .section-t { font: 700 14px/1 var(--d); margin: 26px 0 12px; color: var(--ink-2); }
+  .empty { text-align: center; padding: 48px 12px; color: var(--ink-2); }
+  .empty h2 { font: 700 22px/1.2 var(--d); color: var(--ink); margin: 0 0 10px; }
+  .empty p { max-width: 38ch; margin: 0 auto; }
+  .hint { font-size: 12px; color: var(--ink-3); text-align: center; margin: 18px 0 0; }
+  .shoot { position: fixed; left: 50%; transform: translateX(-50%); bottom: max(18px, env(safe-area-inset-bottom)); display: flex; gap: 10px; z-index: 5; }
+  .btn { height: 56px; padding: 0 20px; border: 0; border-radius: 16px; background: var(--ink); color: #fff; font: 700 14px/1 var(--d); box-shadow: 0 8px 22px rgba(18,28,38,.3); display: inline-flex; align-items: center; gap: 10px; white-space: nowrap; }
+  .btn svg { width: 22px; height: 22px; flex: none; }
+  .btn.light { background: #fff; color: var(--ink); }
+  .btn.small { height: 42px; padding: 0 15px; font-size: 12px; box-shadow: none; gap: 8px; }
+  .btn.small svg { width: 18px; height: 18px; }
+  .btn.danger { background: #fff; color: var(--mythique); }
+  #stage { position: fixed; inset: 0; z-index: 20; background: rgba(10,16,22,.9); display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; overflow: auto; }
+  .stage-in { display: flex; flex-direction: column; align-items: center; width: 100%; }
+  #confetti { position: fixed; inset: 0; pointer-events: none; z-index: 21; }
+  .scan { width: min(300px, 78vw); aspect-ratio: 5/7; border-radius: 18px; background: #111 center / cover; position: relative; overflow: hidden; }
+  .scan::after { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 30%; background: linear-gradient(transparent, rgba(120,200,255,.35), transparent); animation: sweep 1.6s ease-in-out infinite; }
+  @keyframes sweep { from { transform: translateY(-100%); } to { transform: translateY(340%); } }
+  .stage-msg { color: #fff; text-align: center; margin-top: 16px; font-weight: 600; max-width: 32ch; }
+  .big { width: min(310px, 78vw); aspect-ratio: 5/7; perspective: 1600px; position: relative; }
+  @media (max-height: 680px) { .big { width: min(250px, 68vw); } }
+  .flip { position: absolute; inset: 0; transform-style: preserve-3d; transition: transform .55s cubic-bezier(.3,.7,.2,1); }
+  .flip.back { transform: rotateY(180deg); }
+  .face { position: absolute; inset: 0; backface-visibility: hidden; -webkit-backface-visibility: hidden; border-radius: 20px; overflow: hidden; transform: translateZ(0); }
+  .face.front { display: flex; flex-direction: column; padding: 10px; background: var(--r); }
+  .carousel { flex: 1; border-radius: 13px; overflow-x: auto; scroll-snap-type: x mandatory; display: flex; scrollbar-width: none; background: #1b2530; }
+  .carousel::-webkit-scrollbar { display: none; }
+  .carousel div { flex: 0 0 100%; scroll-snap-align: center; background: center / cover no-repeat; }
+  .dots { display: flex; gap: 5px; justify-content: center; margin-top: 7px; min-height: 6px; }
+  .dots i { width: 6px; height: 6px; border-radius: 50%; background: rgba(255,255,255,.45); }
+  .dots i.on { background: #fff; }
+  .face.front .nm { color: #fff; font: 700 19px/1.1 var(--d); padding: 8px 4px 2px; }
+  .face.front .lt { color: rgba(255,255,255,.8); font-style: italic; padding: 0 4px; font-size: 14px; }
+  .face.front .rk { display: inline-block; margin: 8px 4px 2px; background: rgba(255,255,255,.95); color: var(--ink); font: 700 11px/1 var(--d); padding: 6px 9px; border-radius: 8px; }
+  .face.back { transform: rotateY(180deg) translateZ(0); background: var(--card); padding: 18px; overflow-y: auto; border: 6px solid var(--r); }
+  .face.back h3 { font: 700 18px/1.15 var(--d); margin: 2px 0 2px; }
+  .face.back dl { margin: 10px 0 0; font-size: 14px; }
+  .face.back dt { color: var(--ink-3); font-size: 12px; font-weight: 600; margin-top: 9px; }
+  .face.back dd { margin: 2px 0 0; }
+  .enter { animation: enter .45s cubic-bezier(.2,.9,.3,1.1) both; }
+  @keyframes enter { from { transform: translateY(40px) scale(.85); opacity: 0; } to { transform: none; opacity: 1; } }
+  .stamp { position: absolute; top: 12px; right: -10px; transform: rotate(12deg); background: #fff; color: var(--mythique); font: 900 13px/1 var(--d); padding: 8px 10px; border-radius: 8px; box-shadow: inset 0 0 0 3px var(--mythique); animation: stamp .45s .5s cubic-bezier(.3,1.6,.5,1) both; z-index: 3; pointer-events: none; }
+  @keyframes stamp { from { transform: rotate(12deg) scale(2.6); opacity: 0; } to { transform: rotate(12deg) scale(1); opacity: 1; } }
+  .stage-actions { display: flex; gap: 10px; justify-content: center; margin-top: 18px; flex-wrap: wrap; }
+  .sights { display: grid; gap: 8px; margin-top: 10px; }
+  .sight { display: grid; grid-template-columns: 52px 1fr; gap: 10px; align-items: center; font-size: 13px; }
+  .sight i { width: 52px; height: 52px; border-radius: 8px; background: #ccc center / cover; }
+  .note { font-size: 12px; color: var(--ink-3); margin-top: 12px; }
+  .globe-wrap { position: relative; margin-top: 12px; }
+  #globe { width: 100%; max-width: 560px; aspect-ratio: 1; display: block; touch-action: none; cursor: grab; margin: 0 auto; }
+  .country { margin-top: 10px; text-align: center; }
+  .country .dex { text-align: left; }
+  .country .chip { display: inline-flex; align-items: center; gap: 7px; }
+  .country .chip svg { width: 16px; height: 16px; }
+  .chips { justify-content: safe center; }
+  .grouphead { display: flex; align-items: center; gap: 12px; margin: 4px 0 14px; }
+  .grouphead h2 { font: 700 20px/1.15 var(--d); margin: 0; }
+  .grouphead p { margin: 2px 0 0; font-size: 13px; color: var(--ink-2); }
+  .backbtn { flex: none; width: 42px; height: 42px; border: 0; border-radius: 12px; background: var(--card); box-shadow: inset 0 0 0 1.5px var(--rule); display: grid; place-items: center; }
+  .backbtn svg { width: 20px; height: 20px; }
+  .slot .pic .stack { position: absolute; inset: -5px 5px auto; height: 10px; border-radius: 10px 10px 0 0; background: var(--r); opacity: .45; z-index: -1; }
+  .queue { position: fixed; top: max(16px, env(safe-area-inset-top)); right: 16px; display: flex; align-items: center; gap: 9px; background: rgba(255,255,255,.12); border-radius: 14px; padding: 6px 12px 6px 6px; color: #fff; font-size: 12px; font-weight: 600; z-index: 22; }
+  .queue i { width: 44px; height: 44px; border-radius: 9px; background: #333 center / cover; display: block; }
+  .queue b { display: block; font: 700 13px/1.1 var(--d); }
+  .stage-sub { color: rgba(255,255,255,.62); font-size: 13px; text-align: center; max-width: 34ch; margin-top: 8px; }
+  .country h2 { font: 700 20px/1.2 var(--d); margin: 0 0 4px; }
+  .country p { margin: 0 0 12px; color: var(--ink-2); font-size: 14px; }
+  .sugg { display: grid; gap: 4px; margin-top: 6px; }
+  .sugg button { text-align: left; border: 0; background: var(--card); border-radius: 10px; padding: 10px 12px; box-shadow: inset 0 0 0 1px var(--rule); font-weight: 600; }
+  .sugg button span { color: var(--ink-3); font-weight: 500; font-size: 13px; margin-left: 6px; }
+  .warn { background: #fff; border-radius: 12px; padding: 12px 14px; box-shadow: inset 0 0 0 1.5px var(--rule); font-size: 14px; color: var(--ink-2); margin-bottom: 12px; }
+  @media (prefers-reduced-motion: reduce) { .enter, .stamp, .scan::after { animation: none; } .flip { transition: none; } }
+</style>
+</head>
+<body>
+<header>
+  <h1>Bestiodex</h1>
+  <div class="tally"><div><b id="nSp">0</b><span>espèces</span></div><div><b id="nSi">0</b><span>photos</span></div></div>
+</header>
+<main>
+  <div id="warn" class="warn" hidden></div>
+  <nav class="tabs" role="tablist"><button role="tab" data-t="dex" aria-selected="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><rect x="3.5" y="3.5" width="7" height="7" rx="1.8"/><rect x="13.5" y="3.5" width="7" height="7" rx="1.8"/><rect x="3.5" y="13.5" width="7" height="7" rx="1.8"/><rect x="13.5" y="13.5" width="7" height="7" rx="1.8"/></svg>Collection</button><button role="tab" data-t="globe"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="8.5"/><path d="M3.5 12h17M12 3.5c2.6 2.4 3.8 5.2 3.8 8.5s-1.2 6.1-3.8 8.5c-2.6-2.4-3.8-5.2-3.8-8.5s1.2-6.1 3.8-8.5z"/></svg>Globe</button></nav>
+  <section id="tabDex">
+    <input class="search" id="q" type="search" placeholder="Chercher un animal" aria-label="Chercher un animal">
+    <div class="chips" id="chips"></div>
+    <div id="view"></div>
+  </section>
+  <section id="tabGlobe" hidden>
+    <input class="search" id="qc" type="search" placeholder="Chercher un pays" aria-label="Chercher un pays" autocomplete="off">
+    <div class="sugg" id="sugg"></div>
+    <div class="globe-wrap"><canvas id="globe" aria-label="Globe des pays où vous avez photographié des animaux"></canvas></div>
+    <div class="country" id="country"></div>
+  </section>
+</main>
+<div class="shoot">
+  <button class="btn" id="shoot"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.6"/></svg>Photographier</button>
+  <button class="btn light" id="pick"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"><rect x="3.5" y="4.5" width="17" height="15" rx="2.5"/><circle cx="9" cy="10" r="1.8"/><path d="m4 18 5.5-5 4 3.5 2.5-2 4 3.5"/></svg>Importer</button>
+</div>
+<input type="file" id="cam" accept="image/*" capture="environment" hidden>
+<input type="file" id="file" accept="image/*" multiple hidden>
+<div id="stage" hidden></div>
+<canvas id="confetti"></canvas>
+
+<script>
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const RANKS = [['commun', 'Commun'], ['peu_commun', 'Peu commun'], ['rare', 'Rare'], ['epique', 'Épique'], ['legendaire', 'Légendaire'], ['mythique', 'Mythique']];
+const RANK_NAME = Object.fromEntries(RANKS);
+const CATS = [['mammifere', 'Mammifères'], ['oiseau', 'Oiseaux'], ['poisson', 'Poissons'], ['reptile', 'Reptiles'], ['amphibien', 'Amphibiens'], ['insecte', 'Insectes'], ['arachnide', 'Araignées'], ['marin', 'Vie marine'], ['autre', 'Autres']];
+const ICON = {
+  flip: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12a8 8 0 0 1 14-5.3L20 9"/><path d="M20 4v5h-5"/><path d="M20 12a8 8 0 0 1-14 5.3L4 15"/><path d="M4 20v-5h5"/></svg>',
+  trash: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/></svg>',
+  back: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>',
+  globe: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="8.5"/><path d="M3.5 12h17M12 3.5c2.6 2.4 3.8 5.2 3.8 8.5s-1.2 6.1-3.8 8.5c-2.6-2.4-3.8-5.2-3.8-8.5s1.2-6.1 3.8-8.5z"/></svg>',
+  stack: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><rect x="4" y="8" width="14" height="12" rx="2"/><path d="M8 4.5h10.5a2 2 0 0 1 2 2V16"/></svg>',
+  close: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg>',
+};
+let db = null, sample = null, col = null;
+let species = {}, sightings = [], tab = 'dex', filter = null, groupView = null;
+const slug = s => String(s || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 60);
+
+// Stockage : base de Claude dans l'artefact, ou base du téléphone sur le site public.
+const WEB = !window.claude;
+function idbCollection() {
+  const open = () => new Promise((ok, ko) => { const r = indexedDB.open('bestiodex', 1); r.onupgradeneeded = () => r.result.createObjectStore('docs'); r.onsuccess = () => ok(r.result); r.onerror = () => ko(r.error); });
+  const subs = [];
+  const all = async () => { const d = await open(); return new Promise(ok => { const out = [], q = d.transaction('docs').objectStore('docs').openCursor(); q.onsuccess = e => { const c = e.target.result; if (c) { const id = c.key, v = c.value; out.push({ id, data: () => v }); c.continue(); } else ok(out); }; }); };
+  const fire = async () => { const docs = await all(); subs.forEach(f => f({ docs })); };
+  const tx = fn => open().then(d => new Promise((ok, ko) => { const t = d.transaction('docs', 'readwrite'); fn(t.objectStore('docs')); t.oncomplete = ok; t.onerror = () => ko(t.error); })).then(fire);
+  return { onSnapshot(f, err) { subs.push(f); fire().catch(err); }, doc: id => ({ set: v => tx(s => s.put(v, id)), delete: () => tx(s => s.delete(id)) }) };
+}
+const toDataUrl = b => new Promise(ok => { const r = new FileReader(); r.onload = () => ok(r.result); r.readAsDataURL(b); });
+const webSample = { json: async (_p, { images, meta }) => { const r = await fetch('/api/identify', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ image: await toDataUrl(images[0]), meta }) }); if (r.status === 429) throw { code: 'rate_limited' }; if (!r.ok) { let m = ''; try { m = (await r.json()).error; } catch {} throw { code: 'error', message: m || 'Erreur ' + r.status }; } return r.json(); } };
+(async () => {
+  render();
+  if (WEB) { sample = webSample; col = idbCollection(); col.onSnapshot(onSnap, () => warn('La collection n’a pas pu se charger sur ce téléphone.')); return; }
+  const to = setTimeout(() => warn('Ouvrez cette page depuis l’application Claude pour photographier et garder votre collection.'), 10000);
+  let uid = null;
+  try { [db, sample] = await Promise.all([claude.use('db'), claude.use('sample')]); const user = await claude.use('user'); uid = user ? await user.id() : null; } catch {}
+  clearTimeout(to);
+  if (!db || !uid) { warn('Connectez-vous à Claude pour garder votre collection.'); return; }
+  $('#warn').hidden = true;
+  col = db.collection('data/users/' + uid);
+  col.onSnapshot(onSnap, () => warn('La collection n’a pas pu se charger. Réessayez plus tard.'));
+})();
+function onSnap(s) {
+  species = {}; sightings = [];
+  for (const d of s.docs) { const x = { id: d.id, ...d.data() }; if (x.type === 'espece') species[x.id] = x; else if (x.type === 'photo') sightings.push(x); }
+  sightings.sort((a, b) => String(b.at).localeCompare(String(a.at)));
+  render(); if (tab === 'globe') { drawGlobe(); showCountry(gSel); }
+}
+function warn(t) { const w = $('#warn'); w.textContent = t; w.hidden = false; }
+
+// ───────── Bestiodex ─────────
+const catOf = x => ['mollusque', 'crustace'].includes(x.categorie) ? 'marin' : CATS.some(([k]) => k === x.categorie) ? x.categorie : 'autre';
+// Groupe : les espèces ou races proches (ex. plusieurs carpes) partagent une seule case dans la grille.
+const groupOf = x => x.rang === 'inconnu' ? x.id : 'g-' + slug(x.groupe || x.nom);
+const RANK_ORDER = RANKS.map(r => r[0]);
+const membersOf = g => Object.values(species).filter(x => groupOf(x) === g).sort((a, b) => (a.numero || 0) - (b.numero || 0));
+function openGroup(g) { groupView = g; closeStage(); render(); scrollTo({ top: 0, behavior: 'smooth' }); }
+function closeGroup() { groupView = null; render(); }
+// Numéro affiché = rang d'arrivée parmi les espèces encore présentes : supprimer une carte resserre la numérotation.
+const num = x => { if (!x.numero) return ''; const order = Object.values(species).filter(y => y.numero).sort((a, b) => a.numero - b.numero); return String(order.indexOf(x) + 1).padStart(3, '0'); };
+const photosOf = id => sightings.filter(s => s.espece === id);
+const cover = x => (photosOf(x.id)[0] || {}).thumb || x.thumb || '';
+const title = x => x.race || x.nom;
+function render() {
+  const list = Object.values(species);
+  $('#nSp').textContent = list.filter(x => x.rang !== 'inconnu').length;
+  $('#nSi').textContent = sightings.length;
+  if (groupView) {
+    const ms = membersOf(groupView);
+    if (ms.length < 2) groupView = null;
+    else {
+      $('#chips').innerHTML = ''; $('#q').hidden = true;
+      $('#view').innerHTML = `<div class="grouphead"><button class="backbtn" onclick="closeGroup()" aria-label="Retour à la collection">${ICON.back}</button><div><h2>${esc(ms[0].groupe || ms[0].nom)}</h2><p>${ms.length} espèces ou races, ${ms.reduce((n, x) => n + photosOf(x.id).length, 0)} photos</p></div></div><div class="dex">${ms.map(slotHtml).join('')}</div>`;
+      applyCols(); return;
+    }
+  }
+  $('#q').hidden = false;
+  const cats = CATS.filter(([k]) => list.some(x => x.rang !== 'inconnu' && catOf(x) === k));
+  $('#chips').innerHTML = cats.length > 1 ? `<button class="chip" aria-pressed="${!filter}" onclick="setFilter(null)">Tout</button>` + cats.map(([k, n]) => `<button class="chip" aria-pressed="${filter === k}" onclick="setFilter('${k}')">${n}</button>`).join('') : '';
+  const q = slug($('#q').value);
+  const match = x => (!filter || catOf(x) === filter) && (!q || slug([x.nom, x.race, x.latin, x.groupe].join(' ')).includes(q));
+  const known = list.filter(x => x.rang !== 'inconnu' && match(x));
+  const groups = {}; for (const x of known) (groups[groupOf(x)] ||= []).push(x);
+  const tiles = Object.entries(groups).map(([g, ms]) => { ms.sort((a, b) => (a.numero || 0) - (b.numero || 0)); return ms.length > 1 ? { g, ms, numero: ms[0].numero } : ms[0]; }).sort((a, b) => (a.numero || 0) - (b.numero || 0));
+  const unknown = list.filter(x => x.rang === 'inconnu' && !filter && !q);
+  $('#view').innerHTML = !list.length
+    ? `<div class="empty"><h2>Votre Bestiodex est vide</h2><p>Photographiez un animal, n'importe lequel : un moineau, un chat, un poisson. Il devient une carte numérotée, avec le lieu et la date.</p></div>`
+    : `<div class="dex">${tiles.map(t => t.ms ? groupHtml(t) : slotHtml(t)).join('') || '<p class="hint">Aucun animal ne correspond.</p>'}</div>${unknown.length ? `<div class="section-t">Non identifiés</div><div class="dex">${unknown.map(slotHtml).join('')}</div>` : ''}<p class="hint">Pincez la grille pour afficher plus ou moins d’animaux.</p>`;
+  applyCols();
+}
+function groupHtml({ g, ms }) {
+  const top = ms.reduce((r, x) => RANK_ORDER.indexOf(x.rang) > RANK_ORDER.indexOf(r) ? x.rang : r, 'commun');
+  const n = ms.reduce((k, x) => k + photosOf(x.id).length, 0);
+  return `<button class="slot" style="--r:var(--${top})" onclick="openGroup('${g}')"><div class="pic" style="background-image:url('${cover(ms[0])}')"><span class="stack"></span>${ms[0].numero ? `<b>${num(ms[0])}</b>` : ''}<em>${n}</em></div><div class="nm">${esc(ms[0].groupe || ms[0].nom)}</div><div class="sb">${ms.length} espèces</div></button>`;
+}
+function slotHtml(x) {
+  const n = photosOf(x.id).length;
+  return `<button class="slot" style="--r:var(--${x.rang})" onclick="openCard('${x.id}')"><div class="pic" style="background-image:url('${cover(x)}')">${x.numero ? `<b>${num(x)}</b>` : ''}${n > 1 ? `<em>${n}</em>` : ''}</div><div class="nm">${esc(x.rang === 'inconnu' ? 'Inconnu' : title(x))}</div><div class="sb">${x.race ? esc(x.nom) : esc(RANK_NAME[x.rang] || 'À identifier')}</div></button>`;
+}
+function setFilter(k) { filter = k; render(); }
+$('#q').oninput = render;
+// Taille de la grille : uniquement en pinçant, comme la photothèque.
+let cols = innerWidth >= 700 ? 5 : 3;
+try { cols = +localStorage.getItem('bestiodex.cols') || cols; } catch {}
+function applyCols() { document.querySelectorAll('.dex').forEach(g => { g.style.setProperty('--cols', cols); g.classList.toggle('dense', innerWidth < 700 ? cols >= 5 : cols >= 8); }); }
+function zoom(d) { const n = Math.max(2, Math.min(innerWidth >= 700 ? 10 : 7, cols + d)); if (n === cols) return; cols = n; try { localStorage.setItem('bestiodex.cols', cols); } catch {} applyCols(); }
+let pinch = null;
+const dist = t => Math.hypot(t[0].clientX - t[1].clientX, t[0].clientY - t[1].clientY);
+$('#view').addEventListener('touchstart', e => { if (e.touches.length === 2) pinch = dist(e.touches); }, { passive: true });
+$('#view').addEventListener('touchmove', e => { if (pinch && e.touches.length === 2) { e.preventDefault(); const d = dist(e.touches); if (Math.abs(d - pinch) > 50) { zoom(d < pinch ? 1 : -1); pinch = d; } } }, { passive: false });
+$('#view').addEventListener('touchend', () => { pinch = null; }, { passive: true });
+$('#view').addEventListener('wheel', e => { if (e.ctrlKey) { e.preventDefault(); zoom(e.deltaY > 0 ? 1 : -1); } }, { passive: false });
+document.querySelectorAll('nav.tabs button').forEach(b => b.onclick = () => {
+  tab = b.dataset.t; document.querySelectorAll('nav.tabs button').forEach(x => x.setAttribute('aria-selected', x === b));
+  $('#tabDex').hidden = tab !== 'dex'; $('#tabGlobe').hidden = tab !== 'globe';
+  if (tab === 'globe') initGlobe();
+});
+
+// ───────── Capture ─────────
+$('#shoot').onclick = () => $('#cam').click();
+$('#pick').onclick = () => $('#file').click();
+for (const id of ['#cam', '#file']) $(id).onchange = async e => {
+  const all = [...e.target.files]; e.target.value = '';
+  const fs = all.filter(f => !f.type || f.type.startsWith('image/'));
+  if (fs.length < all.length) { stage(`<div class="stage-msg">Les vidéos ne sont pas prises en charge : seules les photos sont ajoutées.</div>`); await wait(1800); if (!fs.length) return closeStage(); }
+  const thumbs = fs.length > 1 ? await Promise.all(fs.map(f => resize(f, 120, .6).catch(() => ''))) : [];
+  for (let i = 0; i < fs.length; i++) await discover(fs[i], fs.length > 1, fs.length > 1 ? { i, n: fs.length, next: thumbs[i + 1] } : null);
+  if (fs.length > 1) closeStage();
+};
+// Pendant une série : la photo suivante attend en petit dans le coin.
+function queueHtml(qu) { if (!qu) return ''; return `<div class="queue">${qu.next ? `<i style="background-image:url('${qu.next}')"></i>` : ''}<span><b>${qu.i + 1} / ${qu.n}</b>${qu.next ? 'Suivante prête' : 'Dernière photo'}</span></div>`; }
+
+async function discover(file, batch, qu) {
+  if (!sample || !col) { warn('La collection n’est pas encore prête. Réessayez dans un instant.'); return; }
+  const meta = await readExif(file).catch(() => ({}));
+  const [big, thumb] = await Promise.all([resize(file, 1024, .82, true), resize(file, 360, .72)]);
+  if (sightings.some(s => s.thumb === thumb)) { stage(`${queueHtml(qu)}<div class="stage-msg">Cette photo est déjà dans votre Bestiodex.</div><div class="stage-actions"><button class="btn small light" onclick="closeStage()">Fermer</button></div>`); if (batch) await wait(1200); return; }
+  // Position : celle de la photo ; sinon celle du téléphone, seulement si la photo vient d'être prise.
+  const fresh = !meta.date || Math.abs(Date.now() - new Date(meta.date)) < 36e5 * 36;
+  if (meta.lat == null && fresh) { try { const p = await new Promise((ok, ko) => navigator.geolocation.getCurrentPosition(ok, ko, { timeout: 6000, maximumAge: 600000 })); meta.lat = p.coords.latitude; meta.lng = p.coords.longitude; } catch {} }
+  stage(`${queueHtml(qu)}<div class="stage-in"><div class="scan" style="background-image:url('${thumb}')"></div><div class="stage-msg">Observation en cours…</div>${meta.lat == null ? '<div class="stage-sub">Cette photo ne contient pas sa position : le lieu ne sera pas connu. Sur iPhone, touchez Options dans le sélecteur de photos et activez Position.</div>' : ''}</div>`);
+  let tz = ''; try { tz = Intl.DateTimeFormat().resolvedOptions().timeZone || ''; } catch {}
+  const knownList = Object.values(species).filter(x => x.rang !== 'inconnu').map(x => `${x.race ? x.race + ', ' : ''}${x.nom} (${x.latin || '?'}), groupe ${x.groupe || x.nom}`);
+  let r;
+  try { r = await sample.json(prompt({ ...meta, known: knownList, tz }), { images: [big], modelTier: 'default', meta: { lat: meta.lat ?? null, lng: meta.lng ?? null, date: meta.date || null, known: knownList, tz } }); }
+  catch (e) {
+    stage(`<div class="stage-msg">${e?.code === 'rate_limited' ? 'Trop de photos d’un coup. Patientez une minute.' : e?.code === 'not_granted' ? 'Bestiodex a besoin de votre accord pour analyser les photos.' : 'L’analyse n’a pas abouti. Réessayez avec cette photo.' + (e?.message ? `<br><small style="opacity:.6">${esc(e.message)}</small>` : '')}</div><div class="stage-actions"><button class="btn small light" onclick="closeStage()">Fermer</button></div>`);
+    if (batch) await wait(2200);
+    return;
+  }
+  const known = r && r.reconnu && r.nom && (r.confiance ?? 1) >= .5;
+  const key = known ? slug((r.latin || r.nom) + (r.race ? '-' + r.race : '')) : 'inconnu-' + Date.now().toString(36);
+  const isNew = !species[key];
+  const at = meta.date || new Date().toISOString();
+  const numero = isNew && known ? Math.max(0, ...Object.values(species).map(x => x.numero || 0)) + 1 : species[key]?.numero;
+  const sp = known ? {
+    type: 'espece', nom: String(r.nom).slice(0, 80), latin: String(r.latin || '').slice(0, 80), groupe: String(r.groupe || species[key]?.groupe || r.nom).slice(0, 60), race: String(r.race || '').slice(0, 60), categorie: String(r.categorie || 'autre'), domestique: !!r.domestique,
+    rang: RANK_NAME[r.rarete] ? r.rarete : 'commun', raison: String(r.raison_rarete || '').slice(0, 240), habitat: String(r.habitat || '').slice(0, 240), repartition: String(r.repartition || '').slice(0, 240),
+    anecdote: String(r.anecdote || '').slice(0, 300), statut: String(r.statut_uicn || '').slice(0, 30), numero, first: species[key]?.first || at, thumb: species[key]?.thumb || thumb,
+  } : { type: 'espece', nom: 'Animal inconnu', rang: 'inconnu', numero: null, first: at, thumb, anecdote: String(r?.raison || 'Bestiodex n’a pas reconnu cet animal avec assez de certitude.').slice(0, 240) };
+  let iso = String(r?.pays_iso || '').replace(/\D/g, ''); iso = iso ? iso.padStart(3, '0').slice(-3) : '';
+  const photo = { type: 'photo', espece: key, thumb, at, lat: meta.lat ?? null, lng: meta.lng ?? null, pays: String(r?.pays || '').slice(0, 60), iso, lieu: String(r?.lieu || '').slice(0, 80) };
+  try { await col.doc(key).set(sp); await col.doc('p-' + Date.now().toString(36) + Math.random().toString(36).slice(2, 5)).set(photo); }
+  catch { stage(`<div class="stage-msg">La carte n’a pas pu être enregistrée. Réessayez.</div><div class="stage-actions"><button class="btn small light" onclick="closeStage()">Fermer</button></div>`); return; }
+  showCard({ id: key, ...sp }, { isNew: isNew && known });
+  if (qu) $('#stage').insertAdjacentHTML('afterbegin', queueHtml(qu));
+  if (batch) await wait(2600);
+}
+const wait = ms => new Promise(r => setTimeout(r, ms));
+
+function prompt() { return ''; } // la consigne est côté serveur (api/identify.js)
+
+// ───────── Carte ouverte : photos à faire glisser, verso, suppression ─────────
+let current = null;
+function frontHtml(x) {
+  const ps = photosOf(x.id); const imgs = ps.length ? ps.map(p => p.thumb) : [x.thumb];
+  return `<div class="face front"><div class="carousel" id="car">${imgs.map(u => `<div style="background-image:url('${u}')"></div>`).join('')}</div><div class="dots" id="dots">${imgs.length > 1 ? imgs.map((_, i) => `<i class="${i ? '' : 'on'}"></i>`).join('') : ''}</div>
+    <div class="nm">${esc(x.rang === 'inconnu' ? 'Animal inconnu' : title(x))}</div>${x.race ? `<div class="lt" style="font-style:normal">${esc(x.nom)}</div>` : x.latin ? `<div class="lt">${esc(x.latin)}</div>` : ''}<div><span class="rk">${x.rang === 'inconnu' ? 'Non identifié' : RANK_NAME[x.rang]}${x.numero ? ` · N° ${num(x)}` : ''}</span></div></div>`;
+}
+function backHtml(x) {
+  const ss = photosOf(x.id);
+  return `<div class="face back"><h3>${esc(x.rang === 'inconnu' ? 'Animal inconnu' : title(x))}</h3>${x.latin ? `<div style="color:var(--ink-2);font-style:italic">${esc(x.latin)}</div>` : ''}
+    <dl>${x.raison ? `<dt>Rareté : ${esc(RANK_NAME[x.rang] || '')}</dt><dd>${esc(x.raison)}</dd>` : ''}${x.habitat ? `<dt>Habitat</dt><dd>${esc(x.habitat)}</dd>` : ''}${x.repartition ? `<dt>Où le trouver</dt><dd>${esc(x.repartition)}</dd>` : ''}${x.anecdote ? `<dt>${x.rang === 'inconnu' ? 'Pourquoi' : 'Le savais-tu'}</dt><dd>${esc(x.anecdote)}</dd>` : ''}${x.statut ? `<dt>Statut de conservation (UICN)</dt><dd>${esc(x.statut)}</dd>` : ''}</dl>
+    <dl><dt>Vos observations (${ss.length})</dt></dl>
+    <div class="sights">${ss.map(s => `<div class="sight"><i style="background-image:url('${s.thumb}')"></i><span>${new Date(s.at).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })}<br>${esc([s.lieu, s.pays].filter(Boolean).join(', ') || 'Lieu inconnu')}</span></div>`).join('')}</div>
+    <p class="note">Identification faite par une IA : elle peut se tromper.</p></div>`;
+}
+function showCard(x, { isNew }) {
+  current = x.id;
+  stage(`<div class="stage-in"><div class="big enter" style="--r:var(--${x.rang})"><div class="flip" id="flip">${frontHtml(x)}${backHtml(x)}</div>${isNew ? '<span class="stamp">Nouveau</span>' : ''}</div>
+    <div class="stage-actions">${!isNew && membersOf(groupOf(x)).length > 1 && groupView !== groupOf(x) ? `<button class="btn small light" onclick="openGroup('${groupOf(x)}')">${ICON.stack}Autres espèces · ${membersOf(groupOf(x)).length - 1}</button>` : ''}<button class="btn small light" onclick="flipCard()">${ICON.flip}Retourner</button><button class="btn small danger" onclick="askDelete()">${ICON.trash}Supprimer</button><button class="btn small" onclick="closeStage()">${ICON.close}Fermer</button></div></div>`);
+  const car = $('#car');
+  car.addEventListener('scroll', () => { const i = Math.round(car.scrollLeft / car.clientWidth); document.querySelectorAll('#dots i').forEach((d, k) => d.classList.toggle('on', k === i)); }, { passive: true });
+  // Toucher la carte la retourne, sauf quand on fait glisser les photos.
+  let sx = 0; $('#flip').addEventListener('pointerdown', e => { sx = e.clientX; });
+  $('#flip').addEventListener('click', e => { if (Math.abs(e.clientX - sx) < 8) flipCard(); });
+  if (isNew) setTimeout(() => confetti(['legendaire', 'mythique', 'epique'].includes(x.rang) ? 200 : 110), 450);
+}
+function flipCard() { const f = $('#flip'); if (!f) return; f.classList.toggle('back'); const st = document.querySelector('.stamp'); if (st) st.hidden = f.classList.contains('back'); }
+function openCard(id) { const x = species[id]; if (x) showCard(x, { isNew: false }); }
+function askDelete() {
+  const x = species[current]; if (!x) return; const ps = photosOf(x.id);
+  const car = $('#car'), i = car ? Math.round(car.scrollLeft / car.clientWidth) : 0;
+  stage(`<div class="stage-in" style="color:#fff;text-align:center;max-width:34ch"><h3 style="font:700 20px/1.2 var(--d);margin:0 0 10px">Supprimer ${esc(x.rang === 'inconnu' ? 'cet animal' : title(x))} ?</h3><p style="margin:0;color:rgba(255,255,255,.75)">${ps.length > 1 ? 'Vous pouvez retirer seulement la photo affichée, ou toute la carte avec ses ' + ps.length + ' photos.' : 'La carte et sa photo seront effacées de votre Bestiodex.'}</p>
+    <div class="stage-actions">${ps.length > 1 ? `<button class="btn small light" onclick="delPhoto('${ps[i]?.id}')">Retirer cette photo</button>` : ''}<button class="btn small danger" onclick="delSpecies('${x.id}')">${ICON.trash}Supprimer la carte</button><button class="btn small" onclick="openCard('${x.id}')">Garder</button></div></div>`);
+}
+async function delPhoto(pid) { if (!pid) return; const id = current; await col.doc(pid).delete(); setTimeout(() => openCard(id), 150); }
+async function delSpecies(id) { for (const p of photosOf(id)) await col.doc(p.id).delete(); await col.doc(id).delete(); closeStage(); }
+function stage(html) { const s = $('#stage'); s.innerHTML = html; s.hidden = false; }
+function closeStage() { $('#stage').hidden = true; $('#stage').innerHTML = ''; current = null; }
+$('#stage').addEventListener('click', e => { if (e.target.id === 'stage') closeStage(); });
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeStage(); });
+
+function confetti(n) {
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  const c = $('#confetti'), g = c.getContext('2d'); c.width = innerWidth; c.height = innerHeight;
+  const palette = ['#D49A12', '#D2344F', '#2F6FD0', '#3E8E5A', '#7B3FC4', '#FFFFFF'];
+  const ps = Array.from({ length: n }, () => ({ x: c.width / 2, y: c.height * .45, vx: (Math.random() - .5) * 14, vy: -Math.random() * 13 - 4, s: 4 + Math.random() * 6, r: Math.random() * 6, vr: (Math.random() - .5) * .3, c: palette[Math.random() * palette.length | 0] }));
+  let t = 0; (function f() { g.clearRect(0, 0, c.width, c.height); for (const p of ps) { p.x += p.vx; p.y += p.vy; p.vy += .35; p.vx *= .99; p.r += p.vr; g.save(); g.translate(p.x, p.y); g.rotate(p.r); g.fillStyle = p.c; g.fillRect(-p.s / 2, -p.s / 4, p.s, p.s / 2); g.restore(); } if (++t < 120) requestAnimationFrame(f); else g.clearRect(0, 0, c.width, c.height); })();
+}
+
+// ───────── Globe : pays grisés, ceux où vous avez des animaux en couleur ─────────
+let WORLD = null, rot = [-10, -20], zk = 1, gSel = null, gAnim = null, hiRes = false;
+const gc = $('#globe'), gx = gc.getContext('2d');
+async function initGlobe() {
+  if (!WORLD) {
+    try { WORLD = decodeTopo(await (await fetch('https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json')).json()); }
+    catch { WORLD = decodeCompact(WORLD_TXT); hiRes = true; }
+  }
+  sizeGlobe(); drawGlobe(); showCountry(gSel);
+}
+// Contours plus précis quand on zoome (chargés une seule fois).
+async function loadHiRes() {
+  if (hiRes) return; hiRes = true;
+  try { WORLD = decodeTopo(await (await fetch('https://cdn.jsdelivr.net/npm/world-atlas@2/countries-50m.json')).json()); drawGlobe(); } catch { hiRes = false; }
+}
+// Carte du monde embarquée (secours hors réseau) : ISO|nom|anneaux en deltas de dixièmes de degré.
+const WORLD_TXT = `242|Fiji|1781,-175 5,-7 -12,0 3,8;-1800,-161 3594,-7 -8,2 8,2 -3594,3
+834|Tanzania|339,-10 38,-21 15,-16 -5,-12 7,-9 -2,-9 3,-14 5,-10 -5,-8 -11,-4 -9,-3 -10,-1 -12,3 -10,12 -6,8 -9,2 -12,4 -9,5 -5,12 -6,6 -1,11 -2,9 8,4 4,5 0,12 3,7 -4,6 15,1 20,0
+732|W. Sahara|-87,277 0,-18 -33,0 1,-25 -10,-1 0,-20 -39,0 20,2 6,8 3,14 14,11 5,12 6,9 9,1 8,-1 9,2
+124|Canada|-1228,490 -21,10 -7,4 -18,4 -6,9 -11,11 -2,8 -12,7 5,10 -17,13 -10,11 -7,7 -9,5 -6,4 -6,5 -10,-3 -10,-6 -8,7 -7,4 -10,3 -10,0 0,57 0,37 19,-2 16,-5 10,-1 9,4 12,3 15,-1 15,4 16,3 7,-4 7,2 10,4 16,-9 14,7 13,-6 16,2 16,-4 23,-4 14,-2 10,1 13,-5 -14,-5 18,-2 27,1 9,2 10,-6 11,5 -10,4 6,4 12,0 9,1 8,-2 10,-6 11,1 17,-5 16,2 15,0 7,8 16,-4 0,-9 6,8 13,10 -11,6 -12,4 1,11 12,7 13,-1 10,-5 14,-11 -9,-5 19,-2 0,-10 13,8 12,-7 -3,-7 10,-7 10,7 7,9 1,11 14,-1 15,-1 13,-5 -7,-11 7,-5 -20,-12 -14,-1 -11,3 -12,-14 -15,-11 -14,-1 -8,-4 -12,-8 -13,-8 -10,-11 -4,-8 -1,-12 15,-1 4,-10 5,-7 14,2 19,-4 10,-4 7,-5 12,-3 11,-4 16,-1 11,-1 -1,-8 3,-10 7,-11 15,-10 8,3 5,11 -5,15 -7,6 16,4 11,7 6,7 -8,16 -12,7 12,11 -5,9 -3,15 7,3 17,-3 10,-1 9,2 9,-3 12,-6 21,-4 3,-21 9,-2 7,-6 15,6 10,11 6,4 8,-9 13,-12 11,-12 -4,-7 13,-5 9,-6 16,-3 7,-3 4,-8 7,-2 5,-15 -7,-3 -7,-4 -17,-3 -12,-9 -17,-1 -22,2 -15,0 -10,-1 -8,-7 -13,-4 -15,-14 -11,-9 8,2 16,13 21,8 15,1 9,-5 -9,-6 3,-11 3,-8 13,-5 17,2 10,11 7,-11 -12,-6 -23,-6 -9,-4 -12,-8 -8,10 18,8 -16,0 -11,-2 -7,6 0,14 -11,1 -11,-5 -3,-8 -8,-6 -22,-3 -16,0 -15,-9 -4,-5 -9,0 -10,0 -2,-7 -13,-5 -11,-2 -11,-5 -7,3 7,10 1,14 -3,9 -10,5 -5,5 -7,3 -9,6 -8,4 -9,3 -10,4 -9,-3 -15,3 -8,-2 -10,4 -10,1 -10,2 -6,6 -20,-4 -35,0 -34,0 -29,0 -31,0 -29,0 -30,0 -10,0 -30,0 -28,0;-788,724 10,4 22,-6 14,-4 20,-2 10,-7 24,-4 9,-4 9,-9 -18,-5 23,-6 16,-3 15,-9 15,0 -3,-7 -17,-12 -12,4 -16,10 -13,-1 9,-12 14,-5 10,-12 -3,-7 -13,2 -25,8 14,-8 11,-6 -26,0 -21,6 -12,5 -12,8 -14,5 -29,-5 -9,4 7,7 19,0 20,2 13,18 -6,8 -15,5 -21,3 -4,9 -9,0 -8,4 -23,-5 -36,3 -22,3 -16,1 -8,4 10,4 -14,0 -3,10 8,9 10,4 26,3 -8,-6 8,-7 9,8 26,5 17,-11 18,-3;-1065,731 11,-4 6,-10 3,-7 17,-5 18,-5 -17,-5 6,-4 -21,-2 -18,3 -11,-1 -19,-3 -25,-2 -18,-1 -6,5 -13,3 -9,-1 -12,8 22,2 14,0 13,2 -19,2 -22,-1 -14,0 18,8 -16,0 -17,3 8,7 7,4 27,6 10,-2 -5,-4 23,3 13,-5 12,5 9,-4 8,-9 5,4 -7,10 9,1 10,-1;-916,819 15,2 12,0 19,2 15,4 12,-1 11,-3 8,6 13,1 18,1 30,1 35,0 21,0 22,-1 27,-1 21,-1 18,-3 -24,-7 -25,-2 -9,-2 22,0 -23,-6 -17,-3 -17,-8 -20,-2 -37,-3 14,-1 -8,-10 -16,-3 -19,-7 19,-2 -27,-8 -26,3 -29,-2 -15,1 -19,1 17,7 -5,7 33,-4 -13,7 -17,2 8,4 18,2 -11,7 -4,6 27,-1 8,-1 16,4 -23,1 -35,-1 -18,4 -8,4 -12,3;-1078,758 9,2 10,0 -4,-10 -34,-1 -25,-5 -15,0 19,8 -45,-2 -14,2 14,10 9,3 28,-4 18,-6 17,0 -14,9 9,4 10,-1 8,-9;-1215,744 14,-2 25,0 10,-3 11,-4 -13,-3 -24,-7 -13,-7 -26,-9 -5,4 -23,6 11,11 9,7 -10,6 34,1;-881,744 -17,1 -26,3 -5,11 -10,4 -21,1 -11,4 24,3 11,-3 20,0 9,-3 9,-7 20,-2 14,-1 16,2 20,1 17,-1 10,-4 -4,-6 -14,-3 -13,2 -29,-2 -20,0;-556,513 -5,-6 -7,-9 7,3 12,-8 14,-1 -3,-7 8,-3 4,-7 -5,-8 -11,1 2,8 -14,-7 -9,7 -10,0 -20,0 5,7 4,8 10,16 7,6 8,3
+840|United States of America|-1228,490 28,0 30,0 10,0 30,0 29,0 31,0 29,0 34,0 35,0 20,0 9,-3 17,-2 10,-4 8,2 12,-3 12,3 10,-4 9,-3 8,-4 8,-3 6,-5 7,-3 10,-8 3,-9 2,-8 -8,-12 2,-7 14,5 11,2 13,5 2,7 10,0 9,0 4,5 11,7 20,2 18,0 8,5 7,12 8,7 10,0 4,-17 7,-6 -9,-8 -11,-3 -10,-3 -5,-6 -2,-8 7,-5 -10,-3 -8,-2 -10,-1 -8,-3 15,2 -11,-5 -10,-1 -6,-16 -6,6 4,-7 -3,-8 -5,-8 2,7 -7,12 1,-10 0,-11 6,-14 -7,-8 -10,-3 -7,-6 -10,-4 -12,-10 -6,-5 -4,-6 0,-14 3,-8 5,-7 4,-16 0,-11 -6,-7 -6,5 -9,11 -5,8 0,11 -10,13 -14,-3 -7,6 -17,1 -9,1 -12,-2 4,-9 -10,-2 -14,6 -9,-1 -7,2 -15,-3 -9,-8 -10,-4 -5,-5 -3,-11 3,-8 -11,2 -8,3 -5,11 -6,6 -4,6 -5,7 -7,4 -14,-8 -8,3 -8,8 -9,10 -9,7 -17,0 -8,-5 -20,0 -23,7 -15,5 -12,1 -11,-1 -8,11 -6,4 -9,3 -10,1 -3,8 -10,10 -8,14 -5,5 -7,9 -2,8 -5,5 2,8 -3,17 4,9 1,9 1,9 -2,14 -3,8 13,3 5,-9 1,11 -3,8;-1554,201 6,-6 -7,-4 -6,6 7,4;-1410,697 0,-37 0,-57 10,0 10,-3 7,-4 8,-7 10,6 10,3 6,-5 6,-4 9,-5 7,-7 10,-11 17,-7 -5,-11 -6,4 -9,3 -2,9 -13,8 -6,9 -9,1 -16,0 -12,3 -21,10 -9,2 -18,4 -14,-1 -19,5 -12,4 -11,-2 2,-7 -17,-3 -9,-3 -11,-2 3,15 11,3 -16,-3 -7,-6 -14,-7 7,-5 -9,-8 -11,-4 -10,-3 -18,-9 -15,-9 -16,-2 -10,-4 -9,-3 -17,-3 10,6 9,3 11,6 12,1 5,4 14,6 10,6 1,7 6,6 -12,-3 -9,-2 -6,5 -17,-2 -7,6 -4,7 -13,-2 -9,5 -6,2 -8,10 4,6 8,5 11,6 15,3 15,3 -7,6 7,4 -17,-2 -10,0 -15,-2 -14,3 -17,10 14,4 22,5 7,-5 21,0 -8,6 -12,4 -7,5 -10,4 -14,4 6,5 18,0 12,5 13,9 10,1 19,5 9,-1 15,6 15,-3 8,-4 21,1 15,-4 10,1 21,-3 19,-1 8,-1 13,2 15,-3 11,-2
+398|Kazakhstan|874,492 -8,-7 -8,0 -1,-10 -5,-5 -20,3 -7,-18 -25,-6 9,-17 -7,-3 -6,-4 -19,5 -17,0 -18,3 -7,-8 -17,3 -8,-5 -19,-9 -5,-7 -6,4 -13,1 -2,8 -4,10 -12,7 -17,-1 -12,-1 -9,9 -9,4 -15,7 -28,-5 1,-37 -12,7 -7,3 -12,-2 -4,7 -12,3 -4,9 -6,6 10,-1 9,9 8,-1 2,9 -12,6 -8,2 -12,-4 -9,-2 -4,7 -6,6 -16,7 5,8 6,13 10,-6 22,18 15,0 22,-7 12,-4 11,4 16,1 12,-6 17,3 -13,12 9,4 8,6 -7,7 42,7 30,6 9,4 18,-2 3,-11 10,3 13,-4 9,-5 25,10 9,-11 22,-25 6,5 13,-6 15,3 10,-8 11,-6 13,1 6,-6
+860|Uzbekistan|560,413 -1,37 26,6 17,-8 9,-4 9,-9 12,1 17,1 12,-7 -1,-10 7,-8 13,-1 6,-4 5,7 13,7 9,1 -9,-7 8,-4 7,3 12,-5 -13,-8 -12,1 -13,5 -3,-6 -5,-6 -11,-4 8,-2 2,-7 -6,-11 -7,3 -6,6 -13,4 -10,5 -7,5 -11,7 -5,10 -14,1 -5,10 -14,6 -8,-6 -9,-4 -9,-5
+598|Papua New Guinea|1410,-26 17,-7 19,-6 7,-5 5,-5 18,-12 -6,-6 11,-13 6,-11 6,-4 7,-2 8,-6 -8,-4 -11,4 -10,2 -8,6 -5,6 -6,8 -13,5 -8,-3 -6,-3 -7,-11 -16,2 0,32 0,33
+360|Indonesia|1410,-26 0,-33 0,-32 -9,8 -10,2 -15,-3 4,8 7,3 -3,11 -5,8 -19,9 -8,0 -15,10 -7,-6 -2,8 -8,5 11,3 -9,3 -4,6 -9,2 -4,5 14,2 21,-1 4,-20 11,-6 8,11 11,6 18,-4 7,-3 11,-2;1179,41 -6,-9 7,-9 10,-14 -12,-1 -3,-7 0,-9 -9,-7 -1,-10 -4,-15 -12,-1 -4,6 -12,4 -12,-4 -11,5 -8,1 -1,13 -10,11 -1,9 1,9 6,7 8,-12 13,1 6,5 14,-2 8,2 5,14 8,15 11,0 9,-2;1229,9 12,0 10,7 -7,-12 -7,-2 -10,2 -16,0 -9,-2 7,-16 6,4 18,4 -9,-9 -9,-4 10,-13 7,-15 -6,-9 1,11 -10,-4 -8,13 1,10 -7,-3 1,-12 0,-14 -10,1 3,9 -2,10 -7,7 4,7 1,7 5,16 11,11 8,-3 12,-1;1085,-64 20,-5 21,0 4,-7 15,-2 12,-6 -11,-4 -11,5 -9,-1 -11,1 -9,2 -12,4 -11,-1 -18,4 -11,5 7,10 12,-1 8,-3;1044,-11 5,-12 12,-8 -2,-12 -1,-16 -11,0 -8,9 -13,8 -4,6 -8,8 -5,7 -8,14 -8,9 -3,8 -4,8 -9,7 -5,8 -8,6 -10,11 5,4 16,-2 9,-9 7,-7 6,-4 9,-11 11,0 8,-7 6,-8 7,-5 -4,-8 6,-4
+032|Argentina|-686,-526 8,-12 13,-7 14,-2 -4,-5 -10,0 -11,3 -10,0 0,23;-576,-302 -3,-8 -2,-10 0,-10 -3,-9 12,-14 5,-11 -10,-18 -15,-5 -20,-2 -11,1 0,-14 -4,-8 -11,-2 -9,4 -3,-13 7,-3 8,-2 -9,-3 -8,-6 -1,-10 -12,-5 -8,-6 -3,-7 10,-7 10,-2 -4,-9 -12,-6 -6,-12 -9,-4 -1,-15 6,-6 -13,3 -24,1 -4,6 -7,7 -4,14 8,4 3,7 4,13 3,13 4,8 -6,6 -1,8 -3,11 3,15 2,10 3,9 6,3 -3,10 0,9 7,7 6,18 0,9 -7,19 6,11 -1,9 3,9 7,10 7,6 -1,24 11,5 3,10 7,12 13,-3 6,-7 4,8 12,0 20,-19 8,-1 12,-8 10,-4 -8,-19 10,-3 11,-1 8,1 9,8 2,9 10,-4 -9,-14 -7,-4 -11,-10 -13,-13
+152|Chile|-686,-526 0,-23 10,0 -5,-7 -11,1 -8,3 -10,1 -13,6 -10,5 -14,12 9,-2 14,-7 13,-4 5,5 3,7 10,4;-696,-176 5,-7 7,-11 -4,-10 6,-11 4,-14 8,-1 -3,-10 -11,-5 0,-17 -6,-13 -7,-10 -3,-9 1,-9 -6,-11 4,-17 3,-11 -6,-10 -7,-15 0,-9 3,-10 -6,-3 -3,-9 -2,-10 2,-13 -2,-13 1,-8 6,-6 -4,-8 -3,-13 -5,-8 -2,-12 -8,-4 1,-11 10,-3 4,-13 24,-1 9,-2 -13,-2 -9,-4 -2,-9 -16,3 -11,7 -12,5 -4,7 -2,12 -1,17 4,10 11,8 -15,3 9,8 3,17 12,-4 5,21 -7,3 -3,-13 -3,16 3,19 5,6 -3,10 -1,11 10,17 7,16 5,15 -3,15 3,8 -1,12 6,13 2,19 3,21 3,22 -1,16 -2,15 8,7
+180|Dem. Rep. Congo|293,-45 2,-9 1,-11 6,-6 5,-12 -17,-1 -6,-8 1,-16 -1,-10 9,-6 4,-9 -12,6 -11,6 -8,2 -8,1 -10,6 -9,3 -11,-1 -6,11 -4,10 -1,10 -12,6 -11,1 -4,-8 -15,-1 -4,6 -5,9 -3,7 -29,0 -11,-2 2,9 5,4 11,3 11,2 6,4 2,12 4,10 5,5 6,5 3,10 1,14 5,12 1,13 10,8 8,-3 6,-4 15,-3 3,6 17,5 7,-2 13,3 10,0 6,-8 12,0 8,-2 8,-7 0,-12 -3,-7 -4,-5 -3,-13 -2,-11 -3,-9 0,-11 0,-12
+706|Somalia|416,-17 -6,8 0,37 9,11 9,4 9,7 13,0 28,30 7,8 4,7 0,15 8,6 10,4 3,-8 -2,-9 -2,-11 -5,-11 -6,-13 -9,-15 -9,-11 -11,-13 -10,-9 -15,-9 -10,-8 -11,-12 -4,-8
+404|Kenya|392,-47 -14,10 -37,26 -2,12 8,11 3,7 -4,12 -6,12 6,5 7,7 5,-7 11,-4 12,-8 15,-2 12,9 11,-4 -9,-11 0,-37 6,-8 -7,-4 -6,-5 -5,-11 -6,-10
+729|Sudan|246,82 -8,5 -4,6 2,8 -6,6 -5,10 -2,9 -1,12 4,11 4,8 9,-1 -1,40 12,4 0,20 40,0 39,0 40,0 3,-10 -1,-12 4,-12 9,-6 -5,-6 -10,-4 -6,-22 0,-12 -4,-10 -6,-5 -5,-8 -5,-7 -3,-10 0,-9 -2,8 -1,8 -5,4 0,15 -11,-2 3,-9 -5,-6 -5,-7 -14,5 -5,-5 -5,-4 -10,0 -9,2 -11,5 -9,2 -6,-14 -6,-3 7,-4
+148|Chad|238,196 1,-40 -9,1 -4,-8 -1,-8 -2,-7 -4,-8 6,-9 -3,-7 -5,-4 -7,-11 -9,-5 -10,1 -7,-8 -17,-8 -14,-1 -2,10 -6,6 -5,5 6,4 3,10 0,13 -4,7 -5,5 -5,10 5,13 12,9 1,13 4,21 -2,7 -4,6 -2,16 10,5 39,-19 40,-19
+332|Haiti|-717,197 0,-9 -7,-6 -11,0 -10,1 11,2 11,2 -5,8 11,2
+214|Dominican Rep.|-717,180 1,12 8,7 8,-3 8,-3 9,-7 -9,-2 -9,-2 -9,1 -4,-7
+643|Russia|1308,422 3,7 2,12 -3,9 9,3 12,-2 7,10 3,11 9,13 -16,-3 -9,-4 -15,0 -4,9 -12,7 -17,4 -4,9 -4,7 -10,14 -8,4 -15,3 -14,-1 -12,-1 -8,-5 5,-8 -14,-14 -14,-11 -12,4 -12,-1 -11,4 -15,-7 -13,-1 -9,-3 -13,2 -9,0 -6,5 -10,5 -10,1 -13,-1 -9,-2 -14,4 -2,8 -12,2 -9,1 -11,4 -11,-10 4,-6 -9,-7 -15,3 -10,0 -7,5 -10,0 -9,3 -15,-5 -19,-8 -10,-2 -10,5 -13,-1 -11,6 -5,6 -20,-1 -13,6 -6,-5 -22,25 -13,8 -21,-7 -10,0 -12,9 -10,-3 -3,11 -18,2 -9,-4 -25,-4 -43,-6 3,-10 -10,-3 -7,-7 16,-7 -17,-5 -15,3 -16,-1 -11,-4 -12,4 -22,7 -15,0 -21,-11 -11,-1 -8,-11 -3,-10 8,-7 14,-6 4,-7 -5,-6 -9,-2 -10,-10 9,-9 10,-19 -6,-4 -13,4 -9,3 -13,6 -21,5 -15,2 -8,2 -14,7 -12,4 -8,5 15,10 -5,4 14,4 -9,1 6,7 9,1 0,9 4,5 -15,6 -12,5 -8,-2 -12,4 -4,6 -9,4 -3,7 -11,-1 -9,-1 -5,10 10,0 -6,7 -9,10 -9,10 -17,4 -3,6 -6,7 1,12 7,6 10,7 -10,5 21,13 9,6 -11,12 4,6 -9,7 7,9 -11,11 9,8 -16,7 10,8 17,4 10,3 17,-6 27,-2 38,-12 8,-4 -11,-12 -16,-3 -45,8 9,-9 1,-15 13,-3 8,-2 -5,9 7,3 24,-6 8,3 -6,7 23,10 9,-1 10,-3 5,7 -8,6 5,6 -7,6 28,-4 5,-5 -12,-1 7,-9 16,2 23,11 35,9 10,-8 7,3 19,1 15,4 11,-6 12,6 -11,6 35,0 14,-3 36,-11 7,5 -10,5 -13,4 -2,12 18,12 7,9 7,2 27,-2 -8,-14 7,-3 3,-7 -2,-14 11,-6 -5,-7 -19,-14 11,-1 15,6 12,10 -6,5 4,7 -11,1 6,15 -13,8 18,7 -2,7 10,-5 -4,-10 11,-1 -5,7 17,4 21,0 18,-6 -9,9 -1,10 17,3 25,-1 21,1 -8,6 12,6 11,0 20,5 26,2 30,3 8,-2 22,5 19,0 12,9 24,4 17,-3 -14,-3 23,-1 12,-3 29,0 22,-5 8,-4 -13,-8 -26,-5 -8,-3 12,-2 15,-2 9,2 5,-7 21,5 32,-2 44,-6 22,6 16,0 16,-6 5,-6 -6,-4 12,-8 16,-4 10,10 16,-4 17,3 19,-4 7,3 17,-1 -8,9 14,4 90,-6 9,-6 26,-8 40,2 20,-1 8,-4 11,-11 14,2 18,1 18,-2 19,1 18,-9 12,3 -8,7 36,1 21,1 29,-5 -3586,-4 25,-8 26,-10 6,-9 -3,8 27,-2 20,-9 -10,-5 -16,-1 -1,-9 -13,-2 -8,3 -13,3 -12,6 -12,-1 -3,7 -12,-2 5,-5 -6,-4 3600,0 -13,-5 -13,1 9,-5 6,-8 6,-7 -21,-1 -28,-7 -9,-1 -16,-8 -14,-6 -18,3 -26,-8 -14,-1 -14,2 -3,-7 -12,-10 12,-6 -1,-14 -10,-1 -4,-8 -13,-10 -4,-11 -15,-2 -3,-11 -14,-9 -4,7 -4,15 -6,22 5,14 9,6 16,7 17,12 18,10 18,8 8,15 -12,-1 -6,-9 -26,-11 -8,13 -26,-4 -25,-16 8,-7 -22,-2 -15,-1 -15,9 -13,-5 -30,1 -33,-3 -32,-19 -39,-24 16,-1 5,-6 10,-2 6,5 11,-1 14,-11 -7,-19 -1,-12 -4,-16 -15,-14 -4,-7 -13,-12 -14,-11 -6,-6 -14,-6 -12,5 -14,-7;535,738 24,8 20,10 33,7 33,1 17,4 20,1 7,-4 -7,-3 -36,-5 -30,-4 -31,-10 -15,-10 -16,-9 2,-9 19,-8 -38,1 -21,7 9,7 19,14 -9,2;1429,537 4,-10 -1,-9 4,-11 11,-17 -15,3 -6,-14 9,-11 -14,-8 -2,8 1,10 -1,11 2,7 1,14 -6,9 1,14 9,5;227,543 -18,0 -12,1 16,8 10,-2 4,-7
+044|Bahamas|-778,270 8,-4 -4,-6 -4,9
+238|Falkland Is.|-612,-518 12,5 8,-2 7,4 8,-4 -17,-7 -13,-1 -5,5
+578|Norway|311,696 -17,-4 -4,6 -13,4 -15,-4 -5,-7 -10,-5 -10,3 -13,-1 -12,6 -12,-3 -20,-5 -12,-6 -7,-7 -10,-11 -15,-14 -10,-7 -7,-10 1,-13 6,-5 -3,-12 -8,-7 -5,-5 -6,6 -20,-12 -14,-2 -13,5 -4,11 -3,23 9,6 27,9 19,10 19,14 24,19 16,8 28,12 22,5 16,-1 15,8 19,0 18,2 31,-7 -13,-3 11,-6;151,797 19,4 13,-4 32,-7 -25,-4 -5,-8 -9,-2 -5,-8 -12,0 -21,6 9,3 -15,3 -20,9 -8,8 28,3 19,-3
+304|Greenland|-468,826 34,6 35,0 13,3 35,1 80,-1 63,-8 -19,-4 -38,0 -54,-1 40,-1 31,-3 19,3 8,-4 -11,-5 26,3 48,4 30,-2 6,-4 -41,-7 -37,-4 23,-1 -12,-7 -8,-6 0,-12 12,-6 -15,-1 -17,-3 19,-5 2,-9 -11,0 13,-9 -22,-1 12,-4 -18,-5 -14,0 13,-7 -20,0 9,-5 13,-6 3,-8 -17,-2 -8,4 -12,5 3,-6 -12,-6 27,0 14,-1 -27,-8 -27,-8 -30,-4 -11,0 -10,-4 -14,-10 -22,-7 -20,-3 -14,-2 -9,-7 -5,-13 -16,-8 4,-8 -5,-8 -5,-10 -14,-1 -15,9 -20,0 -9,5 -7,10 -17,12 -5,7 -2,9 -14,9 4,7 -7,4 10,12 15,3 6,12 -11,-3 -15,-3 -12,3 3,12 10,0 20,-2 -17,6 -9,3 -10,-1 -8,3 11,9 -6,4 -8,7 -12,10 -13,4 -27,10 -21,1 -27,-1 -24,0 -12,3 -17,6 26,3 20,1 -42,2 -23,4 39,9 37,5 -23,7 9,4 34,7 15,1 19,7 31,2 31,0 11,-3 26,5 24,-3 14,-1 21,-3 -24,5
+626|Timor-Leste|1250,-89 9,5 11,1 -11,-8 -8,-3
+710|South Africa|163,-286 5,5 6,-7 11,-2 14,5 0,37 9,-11 1,-9 12,5 7,8 9,1 13,-3 8,5 7,6 6,10 9,8 14,7 9,-2 14,-14 2,-7 -1,-11 -8,-2 -3,-7 6,-9 8,6 5,-8 -1,-8 -10,-10 -6,-6 -8,-12 -12,-11 -7,-6 -7,-4 -11,-4 -6,-3 -11,-1 -11,2 -10,-1 -11,-4 -8,-1 -6,-4 -9,3 -8,5 -5,14 3,9 -6,10 -5,8 -8,13
+426|Lesotho|290,-290 -2,-11 -7,-4 -11,6 5,7 6,3 9,-1
+484|Mexico|-1171,325 11,1 13,1 14,-7 23,-7 20,0 8,5 17,0 9,-7 6,-5 5,-10 14,-6 6,8 15,-4 5,-7 4,-6 6,-6 2,-7 11,-7 7,-3 -2,-15 -1,-14 1,-10 5,-13 7,-7 6,-11 11,-2 13,-2 15,3 12,6 3,14 9,6 11,2 8,0 9,-2 -6,-10 -2,-13 -2,-7 -10,-4 -13,-1 -9,0 -5,-5 8,-6 -10,-6 -5,-8 -12,3 -13,6 -14,-4 -12,1 -7,2 -9,5 -19,6 -9,4 -8,4 -10,3 -15,10 -5,6 2,12 -3,8 -4,9 -9,10 -10,7 -5,7 -9,4 -5,11 -6,5 -2,7 -12,6 -4,5 -6,10 -4,8 -7,8 -9,2 1,-16 11,-11 5,-7 3,-6 6,-6 6,-5 3,-10 6,-9 5,-5 8,-9 -5,-6 -4,6 -6,6 -8,5 -5,10 -6,8 -7,5 -10,3 -6,6 9,4 -7,12 -10,9 -4,6 -4,8 -4,9
+858|Uruguay|-576,-302 16,-7 14,-6 8,-5 6,-7 -4,-5 -2,-12 -11,-6 -8,2 -14,4 -13,5 3,9 0,10 2,10 3,8
+076|Brazil|-534,-338 2,11 -6,7 -8,5 -10,6 -14,8 7,12 11,10 7,4 9,6 -5,14 -2,9 -4,8 -8,2 -1,9 -9,6 -14,0 0,14 -1,13 5,12 -8,9 1,10 -20,0 -3,12 0,13 -12,3 -11,5 -15,5 -11,9 0,11 -12,6 -6,-4 -8,-4 -8,-3 -13,-1 -4,16 -8,-6 -9,0 -4,6 -4,5 -6,6 -4,9 9,9 1,9 13,11 8,2 10,1 5,27 -2,11 -4,10 8,5 -6,7 19,0 8,-6 8,-4 9,4 8,2 5,6 7,3 -9,3 -1,13 13,0 10,4 11,3 8,7 4,-8 -2,-16 4,-10 6,-5 9,2 8,4 13,-1 4,6 11,-1 9,0 10,2 4,7 5,10 6,-6 6,-17 6,-9 -8,-8 21,-4 0,-10 8,6 12,-3 17,-7 5,-5 10,-3 19,-5 15,0 15,-8 13,-11 7,-3 13,-4 3,-12 -2,-23 -5,-6 -14,-14 -7,-12 -7,-8 -6,-8 1,-19 -3,-15 -4,-11 -2,-13 -10,-13 -1,-10 -9,-5 -13,-6 -15,-4 -8,-4 -11,-3 -11,-8 -9,-10 0,-13 -2,-10 -9,-10 -11,-18 -9,-8 -7,-4 -4,-10 -7,-6
+068|Bolivia|-695,-110 12,0 11,7 6,4 13,1 0,-11 10,-16 11,-1 11,-6 10,-3 6,-9 2,-7 1,-12 20,0 -1,-10 8,-9 -2,-8 -2,-10 -12,6 -9,1 -18,-3 -5,-9 -4,-17 -13,2 -4,-8 -6,7 -13,3 -8,-9 -11,12 -6,11 4,10 -6,4 -6,14 6,11 -4,8 5,12 0,16 -6,19
+604|Peru|-699,-43 -9,0 -9,-3 -12,-7 -3,-8 -5,-8 1,-15 6,-6 4,-5 4,-6 9,0 8,6 0,-15 10,0 8,-16 -2,-10 -4,-14 3,-15 -6,-11 -8,-7 -10,5 -20,14 -18,11 -8,7 -4,8 -7,16 -10,18 -9,20 -8,12 -7,7 -8,4 -1,14 3,7 8,6 -1,-10 12,-6 6,5 8,15 12,4 11,10 3,7 1,8 7,-4 7,-8 6,-10 13,1 10,-1 8,-4 -7,-10 8,-6
+170|Colombia|-669,13 -6,7 -23,-3 6,-7 -8,-5 4,-10 2,-11 -5,-27 -5,5 4,11 -8,4 -10,1 -13,-1 -6,10 -7,8 -7,4 -12,5 -11,0 -15,10 2,9 8,4 4,6 4,5 -2,9 -2,9 0,11 -4,5 7,7 4,7 7,7 6,13 6,5 7,2 16,4 8,7 7,-3 -9,-5 -6,-8 -4,-11 3,-11 3,-6 4,-10 13,1 13,-10 11,1 10,-1 -4,-9 1,-14 -2,-10 6,-6 3,-9
+591|Panama|-774,87 0,-11 -8,-1 -2,9 -7,6 -7,-4 -6,-3 4,-8 -9,-3 -6,5 -6,5 -8,2 0,11 7,-3 8,-4 9,3 9,5 11,-2 8,-5
+188|Costa Rica|-825,96 -4,-8 -6,-4 -4,9 -7,3 -7,2 -5,6 2,8 7,-2 10,-3 9,-7
+558|Nicaragua|-837,109 -10,2 -9,1 -9,6 -7,7 -5,4 8,4 6,5 8,3 4,5 9,1 7,3 3,-7 -3,-7 0,-12 -2,-8
+340|Honduras|-831,150 -9,-3 -8,1 -7,-7 -8,-3 -4,-5 -11,1 -7,4 -6,5 4,10 6,4 7,1 10,0 7,2 12,-1 7,-5 7,-4
+222|El Salvador|-894,144 9,-4 8,-2 -8,-6 -8,3 -8,2 6,5
+320|Guatemala|-922,145 5,16 12,0 -6,8 1,9 9,0 10,0 -1,-19 10,-2 -10,-6 -4,-7 -5,-5 -11,0 -10,6
+084|Belize|-891,178 6,7 2,-9 -1,-11 -5,-6 -2,11
+862|Venezuela|-607,52 -14,-10 -10,-4 -8,2 -9,1 4,-10 10,-7 -7,-5 -5,-6 -8,-2 -9,-4 -6,6 -3,9 -6,6 5,5 -5,12 3,11 -8,6 -11,-1 -7,9 -19,0 -4,4 0,10 -4,7 -1,14 7,6 9,7 -6,-4 3,-10 -5,-5 4,-8 7,8 -4,11 12,4 3,8 3,-7 14,-6 9,-4 11,1 5,-4 14,2 12,3 12,0 -8,-3 11,-5 8,-5 1,-8 9,-2 -8,-6 3,-8 -9,-3 -2,-7 7,-8
+328|Guyana|-565,19 -12,-2 -7,-2 -12,3 -4,10 2,8 -3,10 -6,6 -7,8 2,7 9,3 -3,8 8,6 7,-4 6,-7 4,-5 6,-5 2,-12 -6,-5 3,-13 5,-5 6,-9
+740|Suriname|-545,23 -11,1 -4,-6 -11,10 -5,5 -4,8 7,10 2,9 12,-2 9,2 10,-2 -5,-9 5,-13 -3,-9
+250|France|62,495 19,-5 -5,-7 -4,-9 -12,-7 8,-7 3,-7 -1,-10 4,-6 -9,-6 -19,3 -15,-3 -13,-8 -11,5 -22,2 1,10 2,20 -10,11 -8,5 -15,4 12,9 17,-3 -3,12 9,-5 23,8 3,8 9,2 6,-3 12,-9 14,-4;-517,42 -5,-10 -4,-7 -8,-4 -11,2 3,9 -2,10 4,16 11,-4 11,-8;87,426 7,4 2,-8 -4,-8 -7,9
+218|Ecuador|-754,-2 -1,-14 -11,-10 -12,-4 -7,-9 -7,-11 -4,5 -9,4 7,14 -12,5 1,11 5,8 4,7 5,6 6,4 10,-6 13,-5 8,-2
+630|Puerto Rico|-663,185 7,-3 -10,-2 -6,4 9,1
+388|Jamaica|-776,185 12,-3 -8,-5 -11,5 7,3
+192|Cuba|-823,232 9,-1 17,-3 14,-3 12,-8 6,-5 9,-2 7,-3 7,-4 -8,-4 -13,1 -15,-1 7,5 -10,3 -6,9 -15,2 -16,4 -10,5 -7,-5 -10,-4 3,8 9,4 10,2
+716|Zimbabwe|312,-223 -14,2 -10,5 -8,1 -3,6 -15,16 -6,8 -3,8 11,-1 12,5 9,8 4,5 6,4 8,-3 13,-2 7,-3 5,-16 -2,-14 1,-9 -5,-8 -10,-12
+072|Botswana|294,-221 -14,-7 -9,-8 -3,-6 -9,-5 -2,-8 -15,-2 -9,4 -7,-7 -10,-7 -9,2 -5,16 -3,31 10,0 0,35 23,4 10,0 9,2 5,-8 6,-8 11,-11 7,-11 8,-1 6,-5
+516|Namibia|199,-248 0,-37 -9,-5 -12,1 -6,5 -9,-2 -7,8 -4,7 -2,10 -3,7 -3,15 0,12 -5,10 -5,8 -6,12 -10,16 4,10 13,1 6,-4 42,1 7,-5 24,-1 18,4 8,2 11,-3 -9,-3 -6,-4 -19,1 -8,-36 -10,0 0,-30
+686|Senegal|-167,136 -4,8 4,12 6,9 10,1 10,-3 7,-3 6,-7 6,-7 3,-12 4,-6 -7,-3 -10,1 -23,0 -12,-2 -1,8 9,-1 8,4 8,-2 -8,6 -16,-3
+466|Mali|-115,124 -4,10 -3,12 5,8 10,-3 10,2 42,2 2,7 -7,44 -5,44 16,0 34,-22 33,-22 9,-7 5,-8 11,1 0,-23 -6,-7 -10,-8 -13,-1 -10,-4 -9,2 -15,-5 -10,-8 -5,-5 -9,-8 -8,-8 -3,-7 -3,-8 -9,2 -9,-3 -7,4 -1,9 -5,7 -10,0 -10,1 -6,2
+478|Mauritania|-171,210 42,3 -2,15 12,6 -1,25 33,0 0,15 38,-24 -16,0 5,-44 5,-43 -40,-8 -12,-4 -6,3 -5,-6 -10,5 -6,7 -7,3 -10,3 -10,-1 0,16 -2,10 0,10 -8,9
+204|Benin|27,63 -8,-2 -3,7 1,23 -3,7 -6,7 4,6 7,5 6,6 11,-5 2,-10 -6,-13 -5,-9 0,-22
+562|Niger|149,229 2,-16 4,-6 2,-7 -4,-21 -1,-13 -12,-9 -5,-13 5,-10 5,-5 -12,7 -10,-6 -8,3 -8,-1 -12,-3 -17,4 -10,-2 -14,8 -10,-2 -4,-7 -4,-13 -8,5 -6,-3 -12,10 -6,11 0,9 10,4 13,1 9,2 7,13 0,23 14,4 29,20 34,19 16,-5 5,-5 8,4
+566|Nigeria|27,63 0,16 2,12 8,10 -1,12 1,13 4,9 13,4 10,-4 9,-4 17,-3 11,5 9,1 13,-4 8,6 9,-11 6,-4 -10,-13 -3,-6 -3,-8 -2,-7 -6,-4 -4,-9 -7,-8 -6,5 -10,-6 -7,-10 -3,-7 -10,-4 -8,-2 -13,7 -4,7 -7,7 -16,0
+120|Cameroon|145,129 4,-7 0,-13 6,-9 -13,0 3,-10 6,-6 3,-7 -6,-13 -3,-9 5,-13 4,-9 5,-7 -8,-6 -8,2 -12,1 -13,0 -22,0 2,8 -4,6 -7,7 1,11 4,9 9,6 10,-4 6,4 4,8 7,9 2,7 3,8 3,6 8,8 -2,9
+768|Togo|9,110 2,-8 4,-9 1,-25 3,-7 -8,-2 -5,10 1,14 -3,12 -4,12 9,3
+288|Ghana|0,110 4,-8 1,-15 0,-13 3,-11 -13,-10 -15,-6 -9,3 -3,13 2,11 4,8 -2,14 -1,14 17,0 12,0
+384|Côte d'Ivoire|-80,102 12,-1 6,4 8,-1 6,-6 13,1 7,-3 2,-14 -4,-8 -2,-11 4,-9 -5,-4 -13,2 -12,-2 -7,-3 -10,-4 -1,9 -4,9 -6,4 1,9 3,7 1,13 -1,7
+324|Guinea|-137,126 12,-3 10,1 6,-2 7,-4 6,4 8,-4 2,-10 6,-6 2,-16 -5,-9 -6,-4 -4,6 -5,6 -7,-2 -1,10 -5,7 -11,-1 -5,-6 -5,-4 -5,6 -6,5 -4,7 3,8 7,3
+624|Guinea-Bissau|-167,124 9,1 21,1 -2,-9 -8,-2 -4,-5 -6,5 -6,3 -4,6
+430|Liberia|-84,77 -2,-12 6,-4 5,-8 -2,-9 -13,4 -9,8 -9,5 -6,7 3,6 4,5 5,5 9,-5 4,-6
+694|Sierra Leone|-132,89 5,4 5,6 11,1 5,-7 1,-10 -6,-9 -3,-6 -10,5 -5,5 -3,11
+854|Burkina Faso|-54,104 2,10 8,11 4,10 9,0 9,7 11,8 15,-1 0,-9 6,-7 12,-7 -3,-10 -7,-5 -12,-1 -12,0 -17,0 1,-14 -7,3 -8,-3 -7,6
+140|Central African Rep.|274,52 -10,0 -11,0 -9,-1 -11,-5 -9,-6 -7,2 -14,5 -8,3 -10,-8 -7,-6 -13,-4 -5,-9 -6,10 -4,9 -5,5 0,15 8,12 10,4 17,1 9,7 12,4 9,5 7,11 5,4 8,-3 6,-6 -2,-8 4,-6 8,-5 5,-4 7,-8 7,-11 7,-3
+178|Congo|185,35 -4,-11 -3,-15 -1,-10 -8,-11 -5,-5 -4,-10 -2,-12 -6,-4 -6,-7 -10,5 -10,1 -7,-6 -8,10 8,6 -4,6 10,4 15,-1 4,12 -6,13 5,12 -10,1 -2,10 12,-1 8,-2 8,-3 6,15 6,5 14,-2
+266|Gabon|113,23 11,-1 6,-4 10,-4 -2,-14 5,-6 0,-14 -12,-4 -5,5 -8,-6 1,-9 -8,-6 -10,10 -7,9 -6,10 2,6 3,8 2,7 18,1 0,12
+226|Eq. Guinea|96,23 17,0 0,-12 -15,0 -2,12
+894|Zambia|307,-83 9,-5 12,-4 4,-5 3,-8 -4,-11 2,-8 -6,-13 -25,-11 -7,-8 -6,-4 -4,-5 -9,-8 -6,-6 -17,2 -6,3 -15,-1 -6,6 -7,8 0,32 21,0 -1,12 4,7 11,-3 12,-6 6,3 10,-7 7,-9 7,10 -10,2 -1,12 2,12 0,11 16,3
+454|Malawi|328,-92 9,-2 6,-8 3,-13 -3,-8 3,-13 7,-3 4,-7 1,-13 -8,-9 -6,6 1,12 -4,6 -9,4 -2,12 1,12 2,8 -1,11 -4,5
+508|Mozambique|346,-115 19,-2 10,1 9,3 11,4 8,6 1,-15 2,-8 0,-16 -1,-12 -4,-7 -6,-6 -10,-4 -11,-5 -11,-11 -11,-9 -5,-9 5,-8 2,-8 1,-10 0,-10 -13,-7 -12,-6 -3,-7 -6,-6 -3,9 1,14 -2,7 -5,14 10,12 3,7 3,7 -1,10 1,20 -9,4 -7,4 -9,4 29,15 6,-5 7,-5 -1,-12 6,-6 3,7 4,15 -4,7 -7,3 -3,13 3,8
+748|eSwatini|321,-267 -8,-6 -6,6 3,7 8,2 3,-9
+024|Angola|123,-61 11,2 29,0 3,-7 5,-9 4,-6 10,3 9,6 12,3 11,-4 2,-10 0,-12 3,-16 13,2 5,-3 1,-10 -22,-7 0,-32 7,-8 6,-6 -18,-4 -24,1 -7,5 -41,-1 -7,4 -13,-1 -6,4 2,9 3,9 4,14 8,10 4,12 -3,9 -5,12 3,6 -3,10 -7,13
+108|Burundi|305,-24 3,-10 -7,-7 -8,-4 0,12 6,10
+376|Israel|357,327 -7,-8 4,-8 -5,-16 -6,17 5,9 2,7 6,5
+422|Lebanon|358,333 -3,6 5,7 6,-4 -5,-4
+450|Madagascar|495,-125 6,-11 1,-12 2,-9 -5,-8 -4,-6 -1,-9 -4,-11 -5,-14 -6,-19 -4,-14 -4,-11 -8,-3 -9,-4 -14,6 -3,14 -4,8 1,15 5,5 5,7 -2,11 -2,16 3,5 6,7 10,4 10,6 8,6 2,9 9,6 4,11
+270|Gambia|-167,136 11,0 9,0 9,-1 -9,-2 -10,0 -11,-1
+788|Tunisia|95,303 -4,18 -7,4 -8,8 5,14 3,8 -2,9 13,10 7,-7 8,4 -4,-7 3,-7 -1,-9 -6,-5 7,-5 6,-7 -6,-10 -10,-7 -4,-11
+012|Algeria|-87,274 0,14 16,8 10,1 9,3 15,9 6,8 18,6 -4,16 -5,13 10,5 11,2 6,4 10,3 17,2 16,1 15,2 10,0 11,-2 0,-14 -3,-8 -6,-6 9,-14 7,-6 4,-18 3,-9 -1,-13 -1,-10 -3,-10 6,-7 4,-10 13,-3 4,-6 -34,-19 -29,-20 -14,-4 -11,-1 -5,8 -6,2 -36,27 -34,22 -38,24
+400|Jordan|355,324 13,-1 20,11 4,-12 -22,-7 10,-10 -5,-5 -8,-1 -6,-7 -11,2 4,17 1,13
+784|United Arab Emirates|516,242 10,0 14,-1 7,7 7,6 7,7 3,-12 -6,-6 -3,-8 -3,-8 -32,3 -4,10
+634|Qatar|508,248 2,12 6,-8 -5,-6
+414|Kuwait|480,300 4,-14 -9,4 -9,1 7,10
+368|Iraq|392,322 -4,12 22,10 4,12 4,10 5,6 16,1 9,-1 6,-12 7,-3 -4,-10 -3,-7 7,-10 12,-5 5,-8 2,-12 6,-6 -13,2 -7,-10 -19,1 -28,20 -15,7 -12,3
+512|Oman|552,227 3,8 5,6 4,8 4,-7 6,-3 13,-3 5,-6 6,-5 -4,-8 -5,-6 -4,-7 -8,-7 -5,-8 -6,-3 -3,-7 -10,-3 -5,-7 -12,-2 -8,6 -8,17 30,10 7,20 -5,7
+116|Cambodia|1026,122 -3,12 7,8 13,2 9,-1 8,-4 5,7 9,-4 1,-19 -17,-7 4,-6 -10,-1 -9,-4 -8,1 -4,6 -5,10
+764|Thailand|1052,143 -9,1 -13,-2 -7,-8 3,-12 -9,4 -7,8 -10,-11 -5,-15 -3,-8 7,-8 4,-9 2,-9 5,-5 11,-7 -9,-5 -9,9 -8,7 -5,6 -5,5 1,15 4,11 6,9 -4,9 -1,10 -7,8 5,16 -4,6 -6,8 -5,8 9,13 12,5 10,-1 8,-6 -3,-11 1,-9 10,6 9,-1 10,2 7,-8 1,-10 8,-8 -4,-13
+418|Laos|1074,142 -9,4 -5,-7 -8,4 4,13 -8,8 -1,10 -7,8 -10,-2 -9,1 -10,-6 -1,9 3,11 -8,6 7,13 5,9 11,-6 4,-9 12,0 4,-9 -6,-3 9,-9 8,-12 7,-9 7,-7 3,-7 -2,-10
+104|Myanmar|1001,204 -11,-6 -12,-12 1,-10 6,-8 4,-6 -4,-9 6,-15 1,-10 4,-9 -6,-9 -4,-11 2,15 -4,6 1,11 -4,5 -3,12 -2,13 -4,8 -7,-5 -11,-7 -12,3 3,13 -2,9 -8,12 -4,5 -7,8 3,6 5,10 1,18 8,-2 5,8 6,13 12,13 7,4 8,6 3,-6 5,-10 -10,-16 -1,-12 11,2 2,-10 3,-10 8,-4 11,1 -8,-10
+704|Vietnam|1043,105 9,4 10,1 -4,6 17,7 1,12 0,17 -3,7 -7,7 -7,9 -8,12 -12,6 9,6 -4,9 -12,0 -4,9 -6,8 13,2 10,1 8,6 14,-6 3,-10 10,-2 -13,-9 -8,-9 -2,-7 7,-11 10,-13 9,-6 6,-8 4,-19 -1,-17 -8,-7 -12,-6 -8,-9 -12,-9 -4,6 3,7 -8,6
+408|North Korea|1306,424 -6,-5 -3,-10 -7,-4 -10,-5 -5,-7 9,-7 -13,-3 -9,-5 -9,-1 -6,4 5,6 1,9 -10,3 8,7 11,5 7,7 13,-3 14,9 4,6 6,-6
+410|South Korea|1262,377 9,6 11,1 10,-10 3,-18 -4,-5 -9,-2 -8,-4 -9,-1 1,13 -5,10 8,2 -7,8
+496|Mongolia|878,493 10,2 19,8 15,5 9,-3 10,0 7,-5 10,0 15,-3 9,7 -4,6 11,10 11,-4 9,-1 12,-2 2,-8 14,-4 9,2 13,1 10,-1 10,-5 6,-5 9,0 13,-2 9,3 13,1 15,7 11,-4 12,1 -5,-8 -7,-10 8,-2 10,-2 8,4 8,-4 9,-7 -9,-2 -15,-1 -7,-3 -7,-7 -15,-4 -10,-5 -11,2 -11,-5 5,-8 -7,-3 -7,-5 -12,-4 -15,0 -16,-4 -11,-5 -17,3 -15,6 -10,2 -13,-2 -20,2 -12,0 -5,6 -5,9 -18,8 -14,1 -12,2 1,16 -7,8 -14,4 -9,5 -2,7
+356|India|973,283 -2,-12 -20,-5 -5,-14 -5,-13 -8,2 0,-11 -6,-10 -6,16 -4,-6 -5,5 7,6 5,9 -15,1 -10,2 -5,7 -8,4 -4,-6 7,-6 -6,-3 4,-7 2,-13 1,-8 -8,-4 -12,-2 -5,-13 -14,-7 -12,-12 -7,-6 -10,-7 -5,-7 -9,-3 -8,-9 2,-13 -3,-17 0,-17 -10,-9 -6,-6 -4,-6 -13,6 -5,14 -4,10 -8,14 -3,13 -11,20 -4,19 -3,13 0,12 -2,10 -14,-6 -20,13 1,7 -11,9 6,7 22,0 -2,8 -5,5 -8,12 11,11 12,-1 10,11 6,10 10,10 9,13 -8,5 -4,6 -4,9 5,4 16,-2 11,2 9,8 11,-12 -1,-8 4,-5 -7,-4 2,-11 10,-6 14,-7 -6,-5 -4,-9 10,-4 9,-5 13,-5 14,-2 6,-5 19,-3 10,4 -1,11 7,-6 9,-6 15,1 9,7 13,11 12,7 8,-3 7,5 5,-7 7,-5
+050|Bangladesh|927,220 -4,-5 -5,7 -4,6 -9,0 -2,-10 -9,2 -5,9 -4,7 -4,9 8,7 -7,6 4,6 8,-4 5,-7 10,-2 9,0 1,-10 -7,-6 5,-5 4,6 6,-16
+064|Bhutan|917,278 3,-10 -16,1 -16,2 7,9 12,1 10,-3
+524|Nepal|881,279 1,-11 -10,-4 -12,2 -13,6 -14,2 -13,5 -9,5 -10,4 4,9 6,5 12,-1 10,-6 9,-7 8,-2 8,-4 12,-2 11,-1
+586|Pakistan|778,355 -9,-8 -11,-2 -16,2 -5,-4 4,-9 4,-6 8,-5 -9,-6 -10,-17 -6,-10 -10,-11 -12,1 -11,-11 7,-4 6,-13 2,-8 -22,0 -6,-7 -8,2 -3,8 -7,7 -19,-2 -16,0 -14,-1 4,11 14,6 -5,6 -1,9 -9,4 -4,6 -5,5 16,-5 10,2 15,0 13,4 6,14 9,3 11,0 4,9 4,6 2,9 10,0 2,7 5,5 -3,9 5,4 11,2 12,1 11,3 7,-4 3,-8 16,-4
+004|Afghanistan|665,374 13,-3 11,2 6,3 9,5 9,2 1,-12 12,-1 7,5 17,-1 -9,-6 -12,-1 -11,-2 -5,-4 3,-9 -5,-5 -2,-7 -10,0 4,-6 -10,-9 -4,-9 -11,0 -9,-3 -5,-6 -14,-12 -9,-2 -16,0 -16,5 9,9 -9,8 -4,15 5,5 -2,9 4,12 10,-3 10,6 8,1 7,11 9,2 9,1
+762|Tajikistan|678,371 6,11 -2,7 -8,2 11,4 5,6 3,6 14,3 3,-8 -14,-1 9,-5 13,-3 19,1 2,-9 10,-1 1,-10 -10,0 -14,-4 -8,-3 -3,12 -7,6 -5,-8 -11,-5 -11,-2
+417|Kyrgyzstan|710,423 8,5 17,-3 7,8 14,-4 21,1 14,-1 12,-5 -18,-8 -16,-5 -4,-7 -10,2 -17,-7 -20,-6 -13,3 -10,-1 11,4 12,2 13,8 -12,5 -7,-3 -8,4 9,7
+795|Turkmenistan|525,418 16,5 7,-3 7,-7 16,0 7,9 8,6 14,-6 1,-8 14,-1 9,-12 11,-7 7,-5 10,-5 13,-4 -3,-6 -15,-3 -2,-8 -13,-4 -10,-6 -10,3 -1,9 -19,9 -8,1 -11,5 -11,-1 -14,-5 -9,-2 0,18 -8,3 3,7 -5,9 10,-3 8,4 -7,6 -11,3
+364|Iran|486,299 -6,6 -2,12 -5,8 -12,5 -7,10 3,7 4,10 -7,3 -6,12 -6,8 -1,14 7,3 7,-8 10,-1 12,7 3,-7 6,-5 6,-7 9,-2 7,-5 15,-2 15,3 10,4 7,6 11,1 18,-6 8,-1 12,-9 8,-9 -4,-12 -3,-7 4,-15 8,-8 -8,-16 5,-5 4,-6 9,-4 1,-9 5,-6 -14,-6 -4,-11 -19,3 -11,2 -11,1 -4,13 -13,0 -10,-5 -12,3 -10,8 -10,3 -6,9 -8,13 -12,2
+760|Syria|357,327 4,11 5,4 -6,4 1,12 6,5 15,6 13,-2 12,4 16,1 -5,-6 -4,-10 -4,-12 -22,-10 -20,-11 -11,4
+051|Armenia|465,388 -8,5 -7,4 -13,6 -1,8 14,1 6,-4 3,-6 6,-7
+752|Sweden|110,589 5,5 8,7 3,12 -6,5 -1,13 7,10 10,-1 15,22 10,11 7,7 9,0 22,4 7,7 14,-5 15,-7 1,-15 -14,-7 -10,-7 -14,-14 -20,-9 -7,-14 7,-7 10,-5 -9,-11 -11,-3 -4,-17 -5,-9 -12,1 -6,-8 -12,0 -3,9 -8,11 -8,15
+112|Belarus|282,562 10,-3 17,-3 5,-14 10,-6 -9,-4 3,-11 -9,-1 -3,-7 -13,1 -11,2 -19,2 -10,1 -13,-3 -5,4 3,7 -3,8 9,4 11,4 11,9 5,6 11,4
+804|Ukraine|318,521 9,1 11,1 6,-5 6,-6 4,-6 12,-4 8,2 6,-5 21,-3 -4,-8 0,-9 -9,-1 -6,-7 -14,-4 -10,-1 -8,-3 -13,-1 -20,1 -10,3 -3,-6 -8,-7 -9,0 2,10 9,0 -4,10 -7,8 -12,4 -9,-3 -7,-2 -10,-3 -11,3 -11,-1 -6,5 5,7 8,12 6,4 -5,9 11,3 17,-1 12,-2 11,-2 16,0 7,6 9,1
+616|Poland|235,539 3,-8 -6,-6 3,-9 5,-9 -6,-4 -9,-8 -9,0 -12,-1 -11,2 -9,4 -8,4 -9,-2 -5,5 -12,4 -4,6 -2,9 -3,12 7,3 16,4 12,4 10,-2 11,-3 12,-1 18,0 8,-4
+040|Austria|170,481 -7,-4 -1,-8 -11,-2 -13,-2 -14,3 -12,1 -13,0 -3,6 8,-2 10,2 12,2 6,7 11,2 6,4 11,-3 10,-1
+348|Hungary|221,484 6,-5 -11,-9 -6,-7 -8,-2 -14,-2 -12,1 -7,4 -5,4 5,9 10,1 8,1 10,4 8,3 14,-3
+498|Moldova|266,482 9,3 8,-3 8,-4 5,-9 4,-5 -8,0 -5,-5 -5,5 -6,10 -7,7
+642|Romania|282,455 10,0 4,-5 -8,-1 -2,-12 -14,5 -11,-3 -20,-2 -8,2 -6,3 -11,6 -7,6 -7,7 8,2 6,7 5,7 10,4 13,-1 15,0 7,2 6,-4 9,-10 0,-9
+440|Lithuania|265,556 -7,-8 -14,-9 -9,0 -8,4 -4,7 -10,2 -2,8 11,3 17,0 10,1 6,-3 10,-5
+428|Latvia|273,575 6,-7 3,-6 -11,-4 -16,3 -6,3 -10,-1 -17,0 -11,-3 5,14 9,4 8,-8 10,8 9,2 13,-5
+233|Estonia|280,595 -6,-8 3,-9 -12,-3 -9,3 -13,0 -9,8 12,9 13,1 10,-2 11,1
+276|Germany|141,538 3,-12 2,-9 4,-6 -9,-2 -8,-2 -11,-4 3,-8 11,-6 -7,-6 -8,-6 -16,-1 -9,-1 -11,3 -10,-2 6,14 -14,2 -5,7 0,9 -2,11 8,3 3,9 8,6 9,3 -3,10 14,0 10,-6 11,-2 16,-1
+100|Bulgaria|227,442 6,-3 8,-2 15,0 16,5 8,-4 -3,-12 -6,-5 -10,-3 -9,-6 -7,4 -8,-3 -8,7 -5,6 6,6 -5,4
+300|Greece|230,413 15,3 7,-4 9,1 -7,-4 -17,-2 7,-6 -11,-1 -5,5 6,-13 6,-10 -9,-3 -3,-6 4,-9 -15,4 -4,8 -6,12 -5,5 4,8 4,7 11,4 9,1;263,353 -16,-4 -12,4 15,1 7,-2
+792|Turkey|448,372 -9,1 -11,1 -16,-3 -17,-4 -13,2 -11,-3 -7,-6 -8,6 -9,2 -7,-6 -15,-1 -8,5 -11,1 -9,-6 -10,6 -11,0 -6,10 -7,5 5,8 -6,5 11,9 15,1 4,7 19,-1 12,6 12,3 17,0 17,-7 14,-4 12,2 9,-1 12,5 10,1 10,-5 1,-8 7,-3 0,-17 4,-11;261,418 10,3 9,-1 10,-7 -14,-3 -12,-8 -3,6 5,8
+008|Albania|210,408 -4,-7 -4,-5 -8,7 0,11 3,13 6,-4 2,-8 5,-7
+191|Croatia|166,465 10,-5 9,-2 9,-6 -8,-1 -16,1 -7,-2 2,-10 8,-6 13,-8 -11,2 -6,4 -9,3 -8,7 -3,9 -9,-3 -3,7 9,1 7,-1 5,7 8,3
+756|Switzerland|96,475 3,-6 -7,-5 -7,-4 -7,-2 -10,2 -8,3 8,10 7,3 10,2 11,-3
+056|Belgium|62,508 -4,-7 -10,-1 -12,4 -9,4 6,5 17,2 6,-5
+528|Netherlands|69,535 -1,-13 -8,-3 2,-11 -12,7 -10,-2 7,18 14,4
+620|Portugal|-90,419 7,4 9,-5 10,-4 -5,-11 -6,-7 4,-6 -3,-6 -1,-10 -4,-6 -10,1 2,8 -6,7 -1,10 4,8 2,10 -2,7
+724|Spain|-75,371 3,7 1,12 -4,6 5,6 1,9 2,8 -13,-1 -7,3 -7,9 14,7 12,-1 14,0 11,-2 24,0 22,-8 15,-3 12,2 -9,-13 -13,-2 -7,-9 -4,-8 4,-6 -6,-4 -9,-9 -7,-7 -13,0 -10,0 -6,-4 -9,-3 -6,9 -10,2
+372|Ireland|-62,539 -6,-16 -18,-6 -14,1 8,11 -5,10 14,8 7,4 0,-10 14,-2
+540|New Caledonia|1658,-211 8,-6 5,-5 -9,1 -7,4 -7,6 -6,7 13,-4
+090|Solomon Is.|1609,-99 -10,1 5,4 5,-5
+554|New Zealand|1769,-401 -4,-5 -5,-7 -8,-4 -5,4 5,8 -14,10 8,7 1,8 -4,13 -5,6 -7,9 -5,7 10,-5 7,-3 3,-9 7,-10 7,-4 8,-3 12,3 3,-10 -11,-5 -2,-8;1697,-436 8,6 6,5 5,7 5,8 7,5 4,-8 8,4 2,-9 -10,-12 -5,-4 -12,-8 -3,-7 -6,-10 -8,-5 -14,-2 -6,3 -11,1 3,11 13,10 14,5
+036|Australia|1261,-322 -10,-5 -9,-3 -5,-9 -15,-1 -9,2 -14,-2 -6,-5 -8,-2 -12,-3 -17,6 -6,8 7,3 1,11 -6,16 -2,11 -4,7 -4,7 -2,8 -5,8 -1,9 8,-7 -5,13 -3,6 3,8 0,11 4,7 14,3 4,4 8,4 15,3 8,4 19,3 5,5 8,10 1,9 7,9 4,-9 4,12 6,5 5,5 8,6 9,5 12,-3 6,-6 12,-1 3,14 7,11 6,3 14,1 -8,8 12,-1 6,-4 8,-2 9,-2 10,2 7,-4 -7,-9 -5,-9 -3,-8 8,-6 8,-3 12,-9 8,-3 11,-6 7,3 4,10 4,14 -2,13 3,10 1,8 2,9 8,-8 6,-10 1,-10 3,-7 7,3 8,-8 1,-13 4,-6 3,-9 2,-12 11,-5 7,-5 6,-4 5,-9 4,-10 8,-3 4,-9 7,-6 13,-12 2,-8 0,-12 5,-8 -1,-9 -4,-14 -2,-12 -5,-10 -7,-4 -4,-8 -6,-14 -6,-12 -1,-10 -6,-4 -11,0 -9,-4 -11,-8 -8,4 -5,7 -14,-9 -9,3 -11,2 -10,3 -6,6 -2,8 -7,9 -10,1 1,12 -5,-7 -9,-2 6,6 5,11 -9,-2 -6,-3 -4,-8 -8,4 -6,13 -5,4 -11,8 -17,5 -18,-1 -13,-3 -11,-4 -10,1;1477,-408 7,-13 -5,-11 -10,-4 -9,1 -6,8 -7,15 7,4 10,-3 13,3
+144|Sri Lanka|818,75 -2,-10 -13,-5 -4,8 -2,14 4,16 7,-5 5,-7 5,-11
+156|China|803,424 6,8 -9,17 19,4 13,20 20,-3 5,5 1,10 8,0 8,7 6,-6 9,-5 14,-4 7,-8 -4,-12 15,-6 14,-1 12,-6 11,-11 5,-6 12,0 20,-2 13,2 10,-2 15,-6 12,0 16,2 16,4 15,0 12,4 7,5 7,3 -5,8 6,6 16,-3 10,5 15,4 7,7 7,3 15,1 8,-1 -8,10 -8,4 -8,-4 -10,2 -8,2 7,10 5,8 12,-4 14,6 9,15 5,9 3,8 12,1 14,1 15,-3 8,-4 7,-10 7,-11 4,-9 17,-4 12,-7 4,-9 15,0 9,4 16,3 -5,-9 -7,-15 -7,-10 -12,2 -9,-3 3,-9 -2,-12 -5,-5 -6,6 -4,-6 -15,-4 -8,-5 -11,-4 -11,-5 -8,-7 -14,-3 -8,-4 -10,-3 5,5 6,10 -6,5 -8,-3 -12,-7 -6,-6 -10,-1 -5,-5 6,-6 8,-2 8,-7 11,7 9,-4 8,-6 -14,-2 -5,-6 -9,-5 -5,-7 10,-5 4,-10 6,-9 7,-8 -6,-10 8,-9 -2,-8 -2,-8 -13,-11 -8,-14 -9,-12 -14,-9 -14,-8 -11,-1 -6,-5 -10,-1 -14,-5 -10,-2 -4,-11 -8,7 -11,7 -15,1 -3,10 -9,2 -13,-2 -10,-1 -13,-2 -4,-13 -7,6 -7,-2 -12,5 3,8 -8,12 -11,-2 1,12 10,8 0,16 -8,8 -17,1 -1,11 -7,-5 -8,3 -12,-7 -9,-7 -8,-1 -10,3 -7,2 -12,-10 -7,6 -11,1 -12,2 -8,4 -8,2 -9,7 -10,6 -8,3 -18,5 -10,6 -2,11 7,4 -4,5 1,8 -11,12 -16,4 -3,8 -7,4 -4,9 -5,6 -6,8 11,10 17,0 4,7 13,1 19,9;1095,182 -8,3 4,13 11,3 8,-4 -7,-10 -8,-5
+158|Taiwan|1218,244 -6,-16 -5,-8 -5,8 5,17 8,8 3,-9
+380|Italy|104,469 18,2 16,-6 1,-9 -8,1 -8,-3 3,-13 9,-5 5,-8 11,-8 11,-3 6,-5 7,-3 9,-5 -15,0 -4,-6 7,-4 -6,-6 -5,-8 -2,8 -2,7 -7,7 -9,6 -12,5 -8,4 -9,7 -7,5 -3,10 -13,5 -11,-6 -8,5 -3,7 1,10 10,-2 5,4 9,2 12,1;148,381 4,-7 -9,-4 -19,6 13,4 11,1;87,409 11,-4 -1,-13 -9,-3 -4,15
+208|Denmark|99,550 -14,0 -4,5 0,10 4,6 9,1 12,5 -3,-8 6,-4 -13,-10;124,561 -3,-13 -11,6 14,7
+826|United Kingdom|-31,534 -5,12 -12,2 -2,10 -6,-5 0,10 -6,5 4,10 8,8 20,0 -11,-10 10,1 11,0 -2,-8 -9,-9 10,-1 10,-13 13,-13 15,-6 -7,-9 4,-5 -9,-5 -13,0 -17,-3 -11,-3 -9,1 -7,-3 9,12 9,2 -16,2 8,7 -6,5 17,6;-62,539 -8,2 -4,5 7,6 10,-6 -5,-7
+352|Iceland|-145,665 9,-14 -13,-7 -29,-7 -9,-2 -13,1 -28,4 10,4 -22,5 18,2 -21,5 6,7 16,1 15,-7 15,6 13,-3 16,5 17,0
+031|Azerbaijan|464,419 10,-7 12,6 5,-5 5,-7 8,-3 -8,-1 -2,-8 -5,-6 -5,5 -19,-5 -5,8 -6,10 -4,6 10,-1 4,8
+268|Georgia|400,434 9,0 15,-2 14,-5 17,-2 9,-6 2,-7 -14,2 -16,-3 -10,5 -10,-1 -1,11 -6,4 -9,4
+608|Philippines|1223,182 2,-11 -2,-8 -6,-4 -2,-8 2,-8 10,0 13,-5 2,-8 -9,0 -13,8 -9,-2 -4,7 -6,7 -2,14 5,12 3,9 12,-3;1264,84 1,-12 -3,-9 -4,10 -4,-5 3,-8 -15,2 -3,7 -3,9 -8,-3 -7,-6 2,11 6,3 6,4 11,-2 9,5 7,3 2,-9;1226,100 3,9 4,-6 8,9 -1,-9 -7,-10 -9,4;1185,93 -13,-9 5,7 7,6 6,7 5,10 2,-8 -7,-6 -5,-7
+458|Malaysia|1001,65 10,-3 7,-4 12,-3 4,-6 -1,-12 2,-9 7,-12 -7,-4 -9,8 -12,8 -7,11 -1,9 -4,5 -1,12;1179,41 -9,2 -11,0 -4,-11 -9,-18 -8,-2 -9,3 -11,-6 -13,-1 -7,5 14,6 2,8 16,4 7,8 5,6 5,-5 6,3 2,11 7,7 5,8 9,-5 7,-7 9,-3 -8,-4 -5,-9
+096|Brunei|1155,54 -2,-11 -6,-3 -5,5 13,9
+705|Slovenia|138,465 8,-1 14,3 -3,-9 -8,-3 -12,0 1,10
+246|Finland|286,691 14,-14 -9,-8 11,-11 -7,-9 9,-7 -4,-6 15,-7 -13,-11 -21,-13 -18,-1 -18,-3 -16,-3 -6,6 -10,3 2,10 -4,9 4,6 9,6 23,11 6,6 -14,5 -4,19 -15,7 -14,5 18,-3 13,1 10,-3 10,5 5,7 15,4 13,-4 -4,-7
+703|Slovakia|226,491 -5,-7 -13,2 -10,-4 -10,-1 -9,-3 -9,3 5,7 7,5 7,2 9,-3 11,1 17,-2
+203|Czechia|150,511 12,-4 5,-5 9,2 8,-4 5,-5 -7,-2 -7,-5 -10,0 -12,2 -10,-4 -7,3 -6,4 -6,7 6,5 11,4 9,2
+232|Eritrea|364,144 4,19 4,10 12,7 6,-12 3,-9 5,-5 14,-9 5,-6 6,-6 8,-6 -11,2 -4,6 -7,6 -9,4 -9,2 -12,3 -3,-8 -12,2
+392|Japan|1419,392 -9,-10 0,-11 -4,-8 -3,-12 -13,-4 -18,-1 -14,-11 -7,3 -18,6 -11,-5 -12,0 10,-8 -7,-16 -6,-5 -3,13 -6,3 -4,7 10,3 5,6 10,6 7,6 20,3 11,-2 10,18 7,-5 15,10 5,4 7,12 -2,12 4,6 11,2 5,-14;1446,440 7,4 2,-11 -14,-3 -9,-10 -16,7 -5,-11 -11,0 -2,10 5,7 11,1 3,14 3,8 11,-11 8,-3 7,-2;1324,335 5,6 10,3 7,-3 -4,-9 -9,1 -9,-3
+600|Paraguay|-582,-202 3,-19 10,-2 11,-1 3,-12 5,-4 7,-6 -3,-11 -2,-9 -9,-8 -8,-1 -11,1 -10,3 10,15 -12,8 -12,8 -8,1 -19,17 4,11 5,15 18,3 9,-1 9,-5
+887|Yemen|520,190 8,-17 3,-6 -7,-3 -2,-8 -10,-4 -16,-5 -9,-7 -13,-4 -15,-3 -8,-3 -9,-4 -10,6 -1,9 -2,7 -2,9 5,10 2,9 18,-2 12,-2 6,-3 12,13 9,4 29,4
+682|Saudi Arabia|350,294 11,-2 6,7 8,1 5,5 -10,10 20,5 14,-1 15,-7 28,-20 19,-1 9,-1 9,-4 4,-9 7,-6 7,-4 0,-11 5,-6 7,-4 6,-16 30,-5 7,-5 -7,-20 -30,-10 -29,-4 -9,-4 -7,-11 -11,1 -10,1 -13,1 -10,-3 -3,-8 -5,8 -5,7 -6,9 -3,8 -7,7 -11,11 0,13 -6,11 -10,6 -3,6 -3,7 -6,10 -7,8 -5,7 -3,9
+196|Cyprus|327,351 10,-1 -7,-4 -7,5
+504|Morocco|-22,352 4,-7 4,-16 -12,-8 -10,-5 -13,-11 -12,-8 -10,-1 -16,-8 0,-11 -7,-6 -8,-2 -12,0 -3,-8 -8,-13 -14,-11 -3,-14 -6,-8 -22,-1 4,8 3,8 3,7 6,7 6,7 4,12 6,3 7,10 5,4 9,1 8,7 13,11 -2,13 4,8 7,12 10,5 8,4 7,10 3,7 13,-5 10,1 10,-2
+818|Egypt|369,220 -40,0 -39,0 -40,0 0,37 0,35 -3,8 1,11 17,5 10,-3 9,-3 13,2 13,4 10,-7 10,1 13,2 5,-14 -4,-15 -5,-7 -8,8 -7,15 3,-12 6,-10 8,-16 4,-5 12,-17 -2,-8 12,-9
+434|Libya|250,220 0,-20 -12,0 -40,15 -39,19 -10,-5 -8,-4 -5,5 -16,5 -4,6 -8,5 -9,3 -6,12 3,10 1,10 2,9 -4,13 6,7 5,8 8,6 13,4 12,-1 13,-4 5,-9 9,-2 14,-4 11,-5 10,7 -3,8 11,9 20,-1 7,-4 13,-3 -1,-8 -1,-11 3,-8 0,-35 0,-37
+231|Ethiopia|478,80 -28,-30 -13,0 -9,-7 -9,-4 -11,4 -9,-5 -10,-3 -20,9 -11,4 -5,7 -6,11 -6,6 -5,5 -3,7 7,3 0,9 3,10 5,7 5,8 6,5 4,10 1,8 12,-2 3,8 6,-5 15,0 9,-4 7,-6 4,-6 -3,-13 6,-6 6,-10 8,-8 32,-12
+262|Djibouti|424,125 9,-1 -6,-7 -4,-7 -6,6 7,9
+800|Uganda|339,-10 -20,0 -11,0 -10,-4 -2,8 3,12 6,10 7,6 -4,13 11,1 8,2 13,5 5,-7 5,-17 -3,-7 -5,-7 -3,-15
+646|Rwanda|304,-11 4,-6 -3,-7 -9,-5 -5,6 5,10 8,2
+070|Bosnia and Herz.|186,426 -9,4 -8,7 -7,7 -5,4 8,4 14,-1 11,-2 6,-9 -6,-6 -4,-8
+807|Macedonia|224,423 6,-10 -9,-1 -11,-4 -5,7 9,7 10,1
+688|Serbia|188,459 8,3 12,-5 7,-5 6,-7 4,-9 5,-4 -6,-6 -8,-4 -3,7 -7,3 -10,0 -5,12 3,8 -6,7
+499|Montenegro|201,426 -8,-4 -9,3 3,7 8,2 8,-5
+728|S. Sudan|308,35 -8,7 -8,2 -12,0 -6,8 -9,7 -7,11 -7,5 -5,7 -7,4 6,3 3,9 10,6 7,-8 13,0 12,-2 5,4 5,5 8,-6 11,8 5,6 -3,9 6,2 4,-8 6,-11 1,-8 2,-8 -7,-3 -3,-6 11,-6 6,-6 6,-11 -7,-7 -6,-5 -6,-5 -15,-2 -11,-1`;
+function decodeCompact(txt) {
+  return txt.split('\n').filter(Boolean).map(line => {
+    const [id, name, rs] = line.split('|');
+    const rings = rs.split(';').map(r => { let x = 0, y = 0; return [r.split(' ').map(pr => { const [a, b] = pr.split(','); x += +a; y += +b; return [x / 10, y / 10]; })]; });
+    const main = rings.map(r => r[0]).sort((a, b) => b.length - a.length)[0];
+    // longitudes déroulées pour le centre et l’étendue (Russie, Fidji traversent ±180°)
+    let prev = main[0][0], off = 0; const un = main.map(([lo, la]) => { if (lo - prev > 180) off -= 360; else if (prev - lo > 180) off += 360; prev = lo; return [lo + off, la]; });
+    const xs = un.map(p => p[0]), ys = un.map(p => p[1]);
+    let cx = xs.reduce((s, v) => s + v, 0) / xs.length; cx = ((cx + 540) % 360) - 180;
+    const c = [cx, ys.reduce((s, v) => s + v, 0) / ys.length];
+    const ext = Math.max(Math.max(...xs) - Math.min(...xs), Math.max(...ys) - Math.min(...ys));
+    return { id, name, rings, c, ext };
+  });
+}
+function decodeTopo(t) {
+  const [sx, sy] = t.transform.scale, [tx, ty] = t.transform.translate;
+  const arcs = t.arcs.map(a => { let x = 0, y = 0; return a.map(([dx, dy]) => [(x += dx) * sx + tx, (y += dy) * sy + ty]); });
+  const ring = ids => ids.flatMap((i, k) => { const a = i < 0 ? arcs[~i].slice().reverse() : arcs[i]; return k ? a.slice(1) : a; });
+  return t.objects.countries.geometries.map(g => {
+    const polys = g.type === 'Polygon' ? [g.arcs] : g.type === 'MultiPolygon' ? g.arcs : [];
+    const rings = polys.map(p => p.map(ring));
+    const main = rings.map(r => r[0]).sort((a, b) => b.length - a.length)[0] || [[0, 0]];
+    const c = [main.reduce((s, p) => s + p[0], 0) / main.length, main.reduce((s, p) => s + p[1], 0) / main.length];
+    const xs = main.map(p => p[0]), ys = main.map(p => p[1]);
+    const ext = Math.max(Math.max(...xs) - Math.min(...xs), Math.max(...ys) - Math.min(...ys));
+    return { id: String(g.id || '').padStart(3, '0'), name: g.properties?.name || '', rings, c, ext };
+  });
+}
+const RAD = Math.PI / 180;
+function sizeGlobe() { const w = Math.min(gc.clientWidth || 340, 560), d = Math.min(2, devicePixelRatio || 1); gc.width = w * d; gc.height = w * d; gx.setTransform(d, 0, 0, d, 0, 0); gc._w = w; }
+function project([lon, lat]) {
+  const R = (gc._w / 2 - 6) * zk, l = (lon + rot[0]) * RAD, p = lat * RAD, p0 = -rot[1] * RAD;
+  const cosc = Math.sin(p0) * Math.sin(p) + Math.cos(p0) * Math.cos(p) * Math.cos(l);
+  let x = Math.cos(p) * Math.sin(l), y = Math.cos(p0) * Math.sin(p) - Math.sin(p0) * Math.cos(p) * Math.cos(l);
+  if (cosc < 0) { const k = Math.hypot(x, y) || 1; x /= k; y /= k; } // point caché : ramené sur le bord du globe
+  return [gc._w / 2 + R * x, gc._w / 2 - R * y, cosc >= 0];
+}
+function invert(px, py) {
+  const R = (gc._w / 2 - 6) * zk, x = (px - gc._w / 2) / R, y = (gc._w / 2 - py) / R, r = Math.hypot(x, y);
+  if (r > 1) return null;
+  const c = Math.asin(r), p0 = -rot[1] * RAD;
+  const lat = Math.asin(Math.cos(c) * Math.sin(p0) + (r ? y * Math.sin(c) * Math.cos(p0) / r : 0));
+  const lon = Math.atan2(x * Math.sin(c), r * Math.cos(p0) * Math.cos(c) - y * Math.sin(p0) * Math.sin(c));
+  return [lon / RAD - rot[0], lat / RAD];
+}
+const countsByIso = () => { const m = {}; for (const s of sightings) if (s.iso) (m[s.iso] ||= new Set()).add(s.espece); return m; };
+function drawGlobe() {
+  if (!WORLD || !gc._w) return;
+  const w = gc._w, R = (w / 2 - 6) * zk, m = countsByIso();
+  if (zk > 2.5) loadHiRes();
+  gx.clearRect(0, 0, w, w);
+  gx.beginPath(); gx.arc(w / 2, w / 2, R, 0, 7); gx.fillStyle = '#D5DEDA'; gx.fill();
+  for (const c of WORLD) {
+    if (!c.rings.some(poly => poly[0].some(p => project(p)[2]))) continue;
+    gx.beginPath();
+    for (const poly of c.rings) for (const r of poly) { r.forEach((pt, i) => { const [x, y] = project(pt); i ? gx.lineTo(x, y) : gx.moveTo(x, y); }); gx.closePath(); }
+    gx.fillStyle = c.id === gSel ? '#121C26' : m[c.id] ? '#2F6FD0' : '#B6C0BB';
+    gx.fill('evenodd'); gx.strokeStyle = '#E9EEEA'; gx.lineWidth = .6; gx.stroke();
+  }
+  // Vos photos : un point par observation qui a une position.
+  for (const s of sightings) { if (s.lat == null) continue; const [x, y, v] = project([s.lng, s.lat]); if (!v) continue; gx.beginPath(); gx.arc(x, y, 3.2, 0, 7); gx.fillStyle = '#D49A12'; gx.fill(); gx.lineWidth = 1.2; gx.strokeStyle = '#fff'; gx.stroke(); }
+  gx.beginPath(); gx.arc(w / 2, w / 2, R, 0, 7); gx.strokeStyle = 'rgba(18,28,38,.25)'; gx.lineWidth = 1.2; gx.stroke();
+}
+function inRing(pt, r) { let ins = false; for (let i = 0, j = r.length - 1; i < r.length; j = i++) { const [xi, yi] = r[i], [xj, yj] = r[j]; if ((yi > pt[1]) !== (yj > pt[1]) && pt[0] < (xj - xi) * (pt[1] - yi) / (yj - yi) + xi) ins = !ins; } return ins; }
+function countryAt(ll) { if (!ll) return null; const lon = ((ll[0] + 540) % 360) - 180; return WORLD.find(c => c.rings.some(poly => inRing([lon, ll[1]], poly[0]) && !poly.slice(1).some(h => inRing([lon, ll[1]], h)))); }
+// Comme un globe de cartographie : on tourne vers le pays, puis on zoome pour qu'il remplisse l'écran.
+function flyTo(lon, lat, kTo) {
+  cancelAnimationFrame(gAnim); const from = [...rot], kFrom = zk, to = [-lon, -lat], t0 = performance.now();
+  const d0 = ((to[0] - from[0] + 540) % 360) - 180;
+  (function step(t) { const k = Math.min(1, (t - t0) / 900), e = k < .5 ? 4 * k * k * k : 1 - Math.pow(-2 * k + 2, 3) / 2; rot = [from[0] + d0 * e, from[1] + (to[1] - from[1]) * e]; zk = kFrom + (kTo - kFrom) * e; drawGlobe(); if (k < 1) gAnim = requestAnimationFrame(step); })(t0);
+}
+function rotateTo(c) { flyTo(c.c[0], c.c[1], Math.max(1, Math.min(14, 70 / Math.max(c.ext || 40, 3)))); }
+function resetGlobe() { gSel = null; flyTo(-rot[0], -rot[1], 1); showCountry(null); }
+function selectCountry(id) { const c = WORLD && WORLD.find(x => x.id === id); if (!c) return; gSel = c.id; rotateTo(c); showCountry(c.id); $('#qc').value = ''; $('#sugg').innerHTML = ''; }
+let regionNames = null; try { regionNames = new Intl.DisplayNames(['fr'], { type: 'region' }); } catch {}
+function nameOf(c) { const a2 = ISO2[c.id]; try { if (regionNames && a2) return regionNames.of(a2); } catch {} return sightings.find(s => s.iso === c.id)?.pays || c.name; }
+function showCountry(id) {
+  const box = $('#country'), m = countsByIso();
+  if (!WORLD) return;
+  if (!id) { const n = Object.keys(m).length; box.innerHTML = `<p>${n ? `Vos animaux viennent de ${n} pays, en bleu. Touchez un pays ou faites tourner le globe.` : 'Les pays où vous photographiez des animaux s’allumeront en bleu.'}</p>${countryList()}`; return; }
+  const c = WORLD.find(x => x.id === id), xs = [...(m[id] || [])].map(k => species[k]).filter(Boolean);
+  box.innerHTML = `<button class="chip" style="margin-bottom:12px" onclick="resetGlobe()">${ICON.globe}Voir tout le globe</button><h2>${esc(nameOf(c))}</h2><p>${xs.length ? `${xs.length} espèce${xs.length > 1 ? 's' : ''} photographiée${xs.length > 1 ? 's' : ''} ici.` : 'Aucun animal photographié ici pour l’instant.'}</p><div class="dex">${xs.map(slotHtml).join('')}</div>`;
+  applyCols();
+}
+function countryList() {
+  const m = countsByIso(), ids = Object.keys(m).sort((a, b) => m[b].size - m[a].size);
+  return ids.length ? `<div class="sugg">${ids.map(id => { const c = WORLD.find(x => x.id === id); return c ? `<button onclick="selectCountry('${id}')">${esc(nameOf(c))}<span>${m[id].size} espèce${m[id].size > 1 ? 's' : ''}</span></button>` : ''; }).join('')}</div>` : '';
+}
+$('#qc').oninput = () => {
+  const q = slug($('#qc').value); if (!q || !WORLD) { $('#sugg').innerHTML = ''; return; }
+  const m = countsByIso(), hits = WORLD.filter(c => slug(nameOf(c)).includes(q) || slug(c.name).includes(q)).slice(0, 6);
+  $('#sugg').innerHTML = hits.map(c => `<button onclick="selectCountry('${c.id}')">${esc(nameOf(c))}${m[c.id] ? `<span>${m[c.id].size} espèce${m[c.id].size > 1 ? 's' : ''}</span>` : ''}</button>`).join('');
+};
+// Faire tourner le globe au doigt, toucher un pays pour l'ouvrir.
+// Gestes : un doigt fait tourner, deux doigts zooment, double toucher zoome sur le point.
+const ptrs = new Map(); let drag = null, pz = null, lastTap = 0;
+gc.addEventListener('pointerdown', e => { gc.setPointerCapture(e.pointerId); ptrs.set(e.pointerId, [e.clientX, e.clientY]); cancelAnimationFrame(gAnim);
+  if (ptrs.size === 1) drag = { x: e.clientX, y: e.clientY, r: [...rot], moved: false };
+  if (ptrs.size === 2) { const [a, b] = [...ptrs.values()]; pz = { d: Math.hypot(a[0] - b[0], a[1] - b[1]), k: zk }; drag = null; } });
+gc.addEventListener('pointermove', e => { if (!ptrs.has(e.pointerId)) return; ptrs.set(e.pointerId, [e.clientX, e.clientY]);
+  if (pz && ptrs.size === 2) { const [a, b] = [...ptrs.values()]; zk = Math.max(1, Math.min(14, pz.k * Math.hypot(a[0] - b[0], a[1] - b[1]) / pz.d)); drawGlobe(); return; }
+  if (!drag) return; const dx = e.clientX - drag.x, dy = e.clientY - drag.y; if (Math.abs(dx) + Math.abs(dy) > 4) drag.moved = true;
+  const k = 180 / (gc._w * zk); rot = [drag.r[0] + dx * k, Math.max(-85, Math.min(85, drag.r[1] - dy * k))]; drawGlobe(); });
+const endPtr = e => { ptrs.delete(e.pointerId);
+  if (drag && !drag.moved && WORLD && e.type === 'pointerup') {
+    const b = gc.getBoundingClientRect(), ll = invert(e.clientX - b.left, e.clientY - b.top), now = Date.now();
+    if (now - lastTap < 300 && ll) { flyTo(ll[0], ll[1], Math.min(14, zk * 2)); lastTap = 0; }
+    else { lastTap = now; const c = countryAt(ll); if (c) selectCountry(c.id); }
+  }
+  if (ptrs.size < 2) pz = null; if (!ptrs.size) drag = null; };
+gc.addEventListener('pointerup', endPtr); gc.addEventListener('pointercancel', endPtr);
+gc.addEventListener('wheel', e => { e.preventDefault(); zk = Math.max(1, Math.min(14, zk * (e.deltaY > 0 ? .9 : 1.1))); drawGlobe(); }, { passive: false });
+addEventListener('resize', () => { if (tab === 'globe' && WORLD) { sizeGlobe(); drawGlobe(); } });
+const ISO2 = Object.fromEntries('004AF 008AL 010AQ 012DZ 016AS 020AD 024AO 028AG 031AZ 032AR 036AU 040AT 044BS 048BH 050BD 051AM 052BB 056BE 060BM 064BT 068BO 070BA 072BW 076BR 084BZ 090SB 092VG 096BN 100BG 104MM 108BI 112BY 116KH 120CM 124CA 132CV 140CF 144LK 148TD 152CL 156CN 158TW 170CO 174KM 178CG 180CD 184CK 188CR 191HR 192CU 196CY 203CZ 204BJ 208DK 212DM 214DO 218EC 222SV 226GQ 231ET 232ER 233EE 234FO 238FK 239GS 242FJ 246FI 248AX 250FR 254GF 258PF 260TF 262DJ 266GA 268GE 270GM 275PS 276DE 288GH 292GI 296KI 300GR 304GL 308GD 312GP 316GU 320GT 324GN 328GY 332HT 334HM 336VA 340HN 344HK 348HU 352IS 356IN 360ID 364IR 368IQ 372IE 376IL 380IT 384CI 388JM 392JP 398KZ 400JO 404KE 408KP 410KR 414KW 417KG 418LA 422LB 426LS 428LV 430LR 434LY 438LI 440LT 442LU 446MO 450MG 454MW 458MY 462MV 466ML 470MT 474MQ 478MR 480MU 484MX 492MC 496MN 498MD 499ME 500MS 504MA 508MZ 512OM 516NA 520NR 524NP 528NL 531CW 533AW 540NC 548VU 554NZ 558NI 562NE 566NG 570NU 574NF 578NO 580MP 583FM 584MH 585PW 586PK 591PA 598PG 600PY 604PE 608PH 612PN 616PL 620PT 624GW 626TL 630PR 634QA 638RE 642RO 643RU 646RW 652BL 654SH 659KN 660AI 662LC 663MF 666PM 670VC 674SM 678ST 682SA 686SN 688RS 690SC 694SL 702SG 703SK 704VN 705SI 706SO 710ZA 716ZW 724ES 728SS 729SD 732EH 740SR 744SJ 748SZ 752SE 756CH 760SY 762TJ 764TH 768TG 772TK 776TO 780TT 784AE 788TN 792TR 795TM 796TC 798TV 800UG 804UA 807MK 818EG 826GB 831GG 832JE 833IM 834TZ 840US 850VI 854BF 858UY 860UZ 862VE 876WF 882WS 887YE 894ZM'.split(' ').map(s => [s.slice(0, 3), s.slice(3)]));
+
+// ───────── Images : réduction et métadonnées (date, GPS) ─────────
+function resize(file, max, q, asBlob) {
+  return new Promise((ok, ko) => {
+    const img = new Image(), url = URL.createObjectURL(file);
+    img.onload = () => { const k = Math.min(1, max / Math.max(img.width, img.height)); const c = document.createElement('canvas'); c.width = Math.round(img.width * k); c.height = Math.round(img.height * k); c.getContext('2d').drawImage(img, 0, 0, c.width, c.height); URL.revokeObjectURL(url); asBlob ? c.toBlob(b => ok(b), 'image/jpeg', q) : ok(c.toDataURL('image/jpeg', q)); };
+    img.onerror = ko; img.src = url;
+  });
+}
+async function readExif(file) {
+  const v = new DataView(await file.slice(0, 256 * 1024).arrayBuffer());
+  if (v.getUint16(0) !== 0xFFD8) { // HEIC et autres : on cherche le bloc Exif directement
+    for (let o = 0; o < v.byteLength - 12; o++) if (v.getUint32(o) === 0x45786966 && v.getUint16(o + 4) === 0 && [0x4949, 0x4D4D].includes(v.getUint16(o + 6))) return parseTiff(v, o + 6);
+    return {};
+  }
+  let o = 2;
+  while (o < v.byteLength - 4) { const m = v.getUint16(o), len = v.getUint16(o + 2); if (m === 0xFFE1 && v.getUint32(o + 4) === 0x45786966) return parseTiff(v, o + 10); o += 2 + len; }
+  return {};
+}
+function parseTiff(v, t) {
+  const le = v.getUint16(t) === 0x4949, u16 = p => v.getUint16(p, le), u32 = p => v.getUint32(p, le);
+  const ifd = p => { const n = u16(p), out = {}; for (let i = 0; i < n; i++) { const e = p + 2 + i * 12; out[u16(e)] = { type: u16(e + 2), count: u32(e + 4), off: e + 8 }; } return out; };
+  const rat = (p, i) => u32(p + i * 8) / (u32(p + i * 8 + 4) || 1);
+  const str = en => { const p = en.count > 4 ? t + u32(en.off) : en.off; let s = ''; for (let i = 0; i < en.count - 1; i++) s += String.fromCharCode(v.getUint8(p + i)); return s; };
+  const out = {}, d0 = ifd(t + u32(t + 4));
+  if (d0[0x8769]) { const ex = ifd(t + u32(d0[0x8769].off)); const dt = ex[0x9003] || d0[0x0132]; if (dt) { const s = str(dt).replace(/^(\d{4}):(\d{2}):(\d{2})/, '$1-$2-$3'); const d = new Date(s.replace(' ', 'T')); if (!isNaN(d)) out.date = d.toISOString(); } }
+  if (d0[0x8825]) {
+    const g = ifd(t + u32(d0[0x8825].off));
+    if (g[2] && g[4]) {
+      const dms = en => { const p = t + u32(en.off); return rat(p, 0) + rat(p, 1) / 60 + rat(p, 2) / 3600; };
+      let lat = dms(g[2]), lng = dms(g[4]);
+      if (g[1] && String.fromCharCode(v.getUint8(g[1].off)) === 'S') lat = -lat;
+      if (g[3] && String.fromCharCode(v.getUint8(g[3].off)) === 'W') lng = -lng;
+      if (isFinite(lat) && isFinite(lng) && (lat || lng)) { out.lat = lat; out.lng = lng; }
+    }
+  }
+  return out;
+}
+</script>
+</body>
+</html>

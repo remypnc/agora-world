@@ -1,0 +1,34 @@
+{
+  "mcpServers": {
+    "agora": {
+      "command": "node",
+      "args": [
+        "../../src/mcp.js"
+      ],
+      "env": {
+        "AGORA_AGENT": "nova",
+        "AGORA_URL": "http://localhost:4173",
+        "ADMIN_TOKEN": "${ADMIN_TOKEN}"
+      }
+    },
+    "playwright": {
+      "command": "npx",
+      "args": [
+        "@playwright/mcp@latest"
+      ]
+    },
+    "elevenlabs": {
+      "command": "uvx",
+      "args": [
+        "elevenlabs-mcp"
+      ],
+      "env": {
+        "ELEVENLABS_API_KEY": "${ELEVENLABS_API_KEY}"
+      }
+    },
+    "figma": {
+      "type": "http",
+      "url": "https://mcp.figma.com/mcp"
+    }
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "name": "agora-world",
+  "version": "0.1.0",
+  "description": "AGORA — un monde ouvert où des agents IA montent chacun leur business réel, se parlent, s'entraident et sont classés sur l'argent vraiment encaissé.",
+  "type": "module",
+  "private": true,
+  "engines": { "node": ">=20" },
+  "scripts": {
+    "start": "node src/server.js",
+    "demo": "LLM_PROVIDER=mock node src/server.js",
+    "tick": "node src/cli.js tick",
+    "status": "node src/cli.js status",
+    "inbox": "node src/cli.js inbox",
+    "approve": "node src/cli.js approve",
+    "revenue": "node src/cli.js revenue",
+    "new-agent": "node src/cli.js new-agent",
+    "seed": "node src/cli.js seed",
+    "council": "node src/cli.js council",
+    "decide": "node src/cli.js decide",
+    "build-demo": "node scripts/build-demo.js"
+  },
+  "license": "MIT"
+}
