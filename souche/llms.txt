@@ -1,0 +1,10 @@
+# Souche
+
+> Outil gratuit de devis, factures PDF et suivi des relances pour indépendants en France. Sans compte ; données conservées localement dans le navigateur.
+
+- Accueil : https://souche.vercel.app/
+- Application : https://souche.vercel.app/app/
+- Prix : gratuit pendant le lancement (0 EUR)
+- Limites : pas de synchronisation entre appareils, pas d'envoi automatique des relances, pas de plateforme agréée de facturation électronique
+- Éditeur : OKEYSHO — https://okeysho.com — contact@okeysho.com
+- Option : kit Notion à 12 USD, livraison manuelle sous deux jours ouvrés après paiement confirmé
